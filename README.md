@@ -8,6 +8,6 @@ ACTIVE
 
 ## Usage
 
-NOTE: make sure you have Java 11+ installation on your local machine.
+NOTE: make sure you have Java 17+ installation on your local machine.
 
 Run `./start-jenkins.sh` and that's it!
