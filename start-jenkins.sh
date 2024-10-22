@@ -59,6 +59,6 @@ mkdir -p ./logs
 
 # Start the Jenkins
 if [ -f "./jenkins-${CURRENT_JENKINS_VERSION}.war" ] && [ -d "./logs" ]; then
-    jenkins_log_name="$(date '+%Y-%m-%d-%H-%M')"
+    jenkins_log_name="$(date '+%Y-%m-%d-%H')"
     java -jar ./jenkins-${CURRENT_JENKINS_VERSION}.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
 fi
