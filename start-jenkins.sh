@@ -19,14 +19,15 @@ error_and_exit() {
 
 # Install Jenkins if the WAR file does not exist
 # Can execute the download task either via "curl" or "wget".
-if [ ! -f "./jenkins.war" ]; then
-    info "Downloading Jenkins... "
+CURRENT_JENKINS_VERSION="$(cat ./jenkins.version)"
+if [ ! -f "./jenkins-${CURRENT_JENKINS_VERSION}.war" ]; then
+    info "Downloading Jenkins..."
     if command -v curl; then 
-        curl --location https://get.jenkins.io/war/2.481/jenkins.war --output jenkins.war
+        curl --location https://get.jenkins.io/war/${CURRENT_JENKINS_VERSION}/jenkins.war --output jenkins-${CURRENT_JENKINS_VERSION}.war
     elif command -v wget; then
-        wget https://get.jenkins.io/war/2.481/jenkins.war
+        wget https://get.jenkins.io/war/${CURRENT_JENKINS_VERSION}/jenkins-${CURRENT_JENKINS_VERSION}.war
     else
-        error_and_exit "Current machine does not have \"wget\" or \"curl\" to download Jenkins WAR file. Exit with non-zero code" 1
+        error_and_exit "Current machine does not have \"wget\" or \"curl\" to download Jenkins WAR file" 1
     fi
 
 fi
@@ -35,7 +36,7 @@ fi
 mkdir -p ./logs 
 
 # Start the Jenkins
-if [ -f "./jenkins.war" ] && [ -d "./logs" ]; then
+if [ -f "./jenkins-${CURRENT_JENKINS_VERSION}.war" ] && [ -d "./logs" ]; then
     local jenkins_log_name="$(date '+%Y-%m-%d-%H-%M-%S')"
-    java -jar ./jenkins.war >> "./logs/jenkins-${jenkins_log_name}.log" 2>&1
+    java -jar ./jenkins-${CURRENT_JENKINS_VERSION}.war >> "./logs/jenkins-${jenkins_log_name}.log" 2>&1
 fi
