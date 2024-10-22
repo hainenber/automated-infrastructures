@@ -6,9 +6,11 @@ set -euox pipefail
 info() {
     echo "[INFO]" "$*"
 }
-# TODO: Allow below function to use last argument as exit code.
 error_and_exit() {
-    echo "[ERROR]" "$*" 
+    # Log all given arguments except the last on   
+    echo "[ERROR]" "${@:1:$#-1}" 
+    # last argument as exit code.
+    exit "${@:-1}" 
 }
 
 # TODO: Check if Java 8+ installation is available.
@@ -24,7 +26,7 @@ if [ ! -f "./jenkins.war" ]; then
     elif command -v wget; then
         wget https://get.jenkins.io/war/2.481/jenkins.war
     else
-        error_and_exit "Current machine does not have \"wget\" or \"curl\" to download Jenkins WAR file. Exit with non-zero code"
+        error_and_exit "Current machine does not have \"wget\" or \"curl\" to download Jenkins WAR file. Exit with non-zero code" 1
     fi
 
 fi
