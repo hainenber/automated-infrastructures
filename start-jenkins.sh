@@ -1,6 +1,9 @@
 #!/usr/bin/env bash
 
-set -euox pipefail
+set -eo pipefail
+
+## Command dependencies: java, awk, curl (wget) 
+## File dependencies: $ROOT_DIR/jenkins.version
 
 # Helper functions for logging 
 info() {
@@ -8,9 +11,9 @@ info() {
 }
 error_and_exit() {
     # Log all given arguments except the last on   
-    echo "[ERROR]" "${@:1:$#-1}" 
+    echo "[ERROR]" "${@:1:$#-1}. Exit with non-zero code" 
     # last argument as exit code.
-    exit "${@:-1}" 
+    exit ${@: -1}
 }
 
 # Check if Java installation is available.
