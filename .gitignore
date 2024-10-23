@@ -1,3 +1,5 @@
 jenkins*.war
 
 logs/
+
+services/gitea/data
