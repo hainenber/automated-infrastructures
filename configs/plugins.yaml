@@ -1,0 +1,49 @@
+plugins:
+  # Recommended
+  - artifactId: git # Git
+    source:
+      version: latest
+  - artifactId: mailer # Mailer
+    source:
+      version: latest
+  - artifactId: matrix-auth # Matrix Authorization Strategy Plugin
+    source:
+      version: latest
+  - artifactId: pam-auth # PAM Authentication plugin
+    source:
+      version: latest
+  - artifactId: ldap # LDAP plugin
+    source:
+      version: latest
+  - artifactId: dark-theme # Dark Theme
+    source:
+      version: latest
+  - artifactId: workflow-aggregator # Pipeline
+    source:
+      version: latest
+  - artifactId: pipeline-graph-view # Pipeline Graph View plugin
+    source:
+      version: latest
+  - artifactId: timestamper # Timestamper
+    source:
+      version: latest
+  - artifactId: antisamy-markup-formatter # OWASP Markup Formatter plugin
+    source:
+      version: latest
+  - artifactId: build-timeout # Build Timeout
+    source:
+      version: latest
+  - artifactId: credentials-binding # Credentials Binding plugin
+    source:
+      version: latest
+  - artifactId: ssh-slaves # SSH Build Agents plugin
+    source:
+      version: latest
+  - artifactId: ws-cleanup # Workspace Cleanup plugin
+    source:
+      version: latest
+
+  # Custom
+  - artifactId: configuration-as-code # Configuration as Code
+    source:
+      version: latest 

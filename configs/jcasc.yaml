@@ -1,0 +1,8 @@
+jenkins:
+  systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code (JCasC)\n\n"
+
+# Force enable Dark theme
+appearance:
+  themeManager:
+    disableUserThemes: true
+    theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings

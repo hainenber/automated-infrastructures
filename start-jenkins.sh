@@ -19,12 +19,37 @@ error_and_exit() {
     exit ${@: -1}
 }
 
+# Helper functions to help with downloading Jenkins-related binaries 
+download_artifact() {
+    if [ ! -f "./versions/${1}.version" ]; then
+        error_and_exit "Root directory does not have \"${1}.version\" to select approriate ${1} version" 1
+    fi
+
+    ARTIFACT_VERSION="$(head --lines=1 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(head --lines=2 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_TEMPLATE_NAME="$(head --lines=3 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
+
+    ARTIFACT_DOWNLOAD_URL=$(eval "echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
+    ARTIFACT_NAME=$(eval "echo \"$ARTIFACT_TEMPLATE_NAME\"")
+
+    if [ ! -f "./${ARTIFACT_NAME}" ]; then
+        info "Downloading $1..."
+        if command -v curl 2>&1 >/dev/null ; then 
+            curl --location "${ARTIFACT_DOWNLOAD_URL}" --output "${ARTIFACT_NAME}"
+        elif command -v wget 2>&1 >/dev/null; then
+            wget "${ARTIFACT_DOWNLOAD_URL}" -O "${ARTIFACT_NAME}"
+        else
+            error_and_exit "Current machine does not have \"wget\" or \"curl\" to download binary" 1
+        fi
+    fi
+}
+
 # Check if Java installation is available.
 # Else, check if Java installation is Java17 or else.
 # Beginning with the Jenkins 2.463 weekly release (scheduled for release on June 18, 2024), Jenkins requires Java 17 or newer
 # Source: https://www.jenkins.io/blog/2024/06/11/require-java-17/
 if [ -z "${JAVA_HOME}" ] || ! command -v java 2>&1 >/dev/null ; then 
-    error_and_exit "Current machine does not have Java installation to proceed further"  1
+    error_and_exit "Current machine does not have Java installation to proceed further" 1
 else
     # Get the Java version
     java_version=$(java -version 2>&1 | head -n 1 | awk -F '"' '{print $2}')
@@ -37,31 +62,28 @@ else
     fi
 fi
 
-# Get Jenkins version pinned in "jenkins.version"
-if [ ! -f "./jenkins.version" ]; then
-    error_and_exit "Root directory does not have \"jenkins.version\" to select approriate Jenkins version" 1
-fi
-
-# Install Jenkins if the WAR file does not exist
+# Install required artifacts
 # Can execute the download task either via "curl" or "wget".
-CURRENT_JENKINS_VERSION="$(cat ./jenkins.version)"
-if [ ! -f "./jenkins-${CURRENT_JENKINS_VERSION}.war" ]; then
-    info "Downloading Jenkins..."
-    if command -v curl; then 
-        curl --location https://get.jenkins.io/war/${CURRENT_JENKINS_VERSION}/jenkins.war --output jenkins-${CURRENT_JENKINS_VERSION}.war
-    elif command -v wget; then
-        wget https://get.jenkins.io/war/${CURRENT_JENKINS_VERSION}/jenkins-${CURRENT_JENKINS_VERSION}.war
+download_artifact "jenkins"
+download_artifact "jenkins-plugin-manager"
+
+# Create directory for Jenkins logs and plugins
+mkdir -p ./logs ./data ./data/plugins
+
+if [ -f ./jenkins-*.war ]; then
+    # Prepare the plugins
+    if [ -f "./configs/plugins.yaml" ]; then
+        info "Handling plugins..."
+        java -jar jenkins-plugin-manager-*.jar \
+            --war ./jenkins-*.war \
+            --verbose \
+            --plugin-download-directory ./data/plugins \
+            --plugin-file ./configs/plugins.yaml
     else
-        error_and_exit "Current machine does not have \"wget\" or \"curl\" to download Jenkins WAR file" 1
+        warn "Configuration file for Jenkins plugins are not found. Handle plugins manually."
     fi
 
-fi
-
-# Create directory for Jenkins logs.
-mkdir -p ./logs 
-
-# Start the Jenkins
-if [ -f "./jenkins-${CURRENT_JENKINS_VERSION}.war" ] && [ -d "./logs" ]; then
+    # Start the Jenkins
     jenkins_log_name="$(date '+%Y-%m-%d-%H')"
-    java -jar ./jenkins-${CURRENT_JENKINS_VERSION}.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
+    JENKINS_HOME="./data" CASC_JENKINS_CONFIG="./configs/jcasc.yaml" java -jar ./jenkins-*.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
 fi
