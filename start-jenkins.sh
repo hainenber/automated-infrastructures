@@ -9,6 +9,9 @@ set -eo pipefail
 info() {
     echo "[INFO]" "$*"
 }
+warn() {
+    echo "[WARN]" "$*"
+}
 error_and_exit() {
     # Log all given arguments except the last on   
     echo "[ERROR]" "${@:1:$#-1}. Exit with non-zero code" 
