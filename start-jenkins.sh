@@ -85,7 +85,7 @@ if [ -f ./jenkins-*.war ]; then
 
     # Configure Groovy init hook scripts
     if [ -d "./hook-scripts/init" ]; then
-        mv ./hook-scripts/init/*.groovy ./data/init.groovy.d
+        cp ./hook-scripts/init/*.groovy ./data/init.groovy.d
     fi
 
     # Start the Jenkins
