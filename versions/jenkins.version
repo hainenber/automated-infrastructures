@@ -1,0 +1,3 @@
+version: 2.481
+download_url: https://get.jenkins.io/war/${ARTIFACT_VERSION}/jenkins.war 
+artifact_name: jenkins-${ARTIFACT_VERSION}.war
