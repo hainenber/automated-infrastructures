@@ -1,5 +1,12 @@
-jenkins*.war
+# Downloaded artifacts
+*.war
+*.jar
 
+# Jenkins logs
 logs/
 
+# Self-hosted Git server data
 services/gitea/data
+
+# Jenkins data
+data/
