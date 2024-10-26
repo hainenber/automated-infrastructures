@@ -25,18 +25,18 @@ download_artifact() {
         error_and_exit "Root directory does not have \"${1}.version\" to select approriate ${1} version" 1
     fi
 
-    ARTIFACT_VERSION="$(head --lines=1 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
-    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(head --lines=2 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
-    ARTIFACT_TEMPLATE_NAME="$(head --lines=3 ./versions/${1}.version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_VERSION="$(head --lines=1 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(head --lines=2 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_TEMPLATE_NAME="$(head --lines=3 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
 
     ARTIFACT_DOWNLOAD_URL=$(eval "echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
     ARTIFACT_NAME=$(eval "echo \"$ARTIFACT_TEMPLATE_NAME\"")
 
     if [ ! -f "./${ARTIFACT_NAME}" ]; then
         info "Downloading $1..."
-        if command -v curl 2>&1 >/dev/null ; then 
+        if command -v curl >/dev/null 2>&1; then 
             curl --location "${ARTIFACT_DOWNLOAD_URL}" --output "${ARTIFACT_NAME}"
-        elif command -v wget 2>&1 >/dev/null; then
+        elif command -v wget >/dev/null 2>&1; then
             wget "${ARTIFACT_DOWNLOAD_URL}" -O "${ARTIFACT_NAME}"
         else
             error_and_exit "Current machine does not have \"wget\" or \"curl\" to download binary" 1
@@ -48,7 +48,7 @@ download_artifact() {
 # Else, check if Java installation is Java17 or else.
 # Beginning with the Jenkins 2.463 weekly release (scheduled for release on June 18, 2024), Jenkins requires Java 17 or newer
 # Source: https://www.jenkins.io/blog/2024/06/11/require-java-17/
-if [ -z "${JAVA_HOME}" ] || ! command -v java 2>&1 >/dev/null ; then 
+if [ -z "${JAVA_HOME}" ] || ! command -v java >/dev/null 2>&1 ; then 
     error_and_exit "Current machine does not have Java installation to proceed further" 1
 else
     # Get the Java version
@@ -70,7 +70,7 @@ download_artifact "jenkins-plugin-manager"
 # Create directory for Jenkins logs and plugins
 mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d
 
-if [ -f ./jenkins-*.war ]; then
+if ls ./jenkins-*.war >/dev/null 2>&1; then
     # Prepare the plugins
     if [ -f "./configs/plugins.yaml" ]; then
         info "Handling plugins..."
