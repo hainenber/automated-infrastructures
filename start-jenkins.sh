@@ -68,7 +68,7 @@ download_artifact "jenkins"
 download_artifact "jenkins-plugin-manager"
 
 # Create directory for Jenkins logs and plugins
-mkdir -p ./logs ./data ./data/plugins
+mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d
 
 if [ -f ./jenkins-*.war ]; then
     # Prepare the plugins
@@ -81,6 +81,11 @@ if [ -f ./jenkins-*.war ]; then
             --plugin-file ./configs/plugins.yaml
     else
         warn "Configuration file for Jenkins plugins are not found. Handle plugins manually."
+    fi
+
+    # Configure Groovy init hook scripts
+    if [ -d "./hook-scripts/init" ]; then
+        mv ./hook-scripts/init/*.groovy ./data/init.groovy.d
     fi
 
     # Start the Jenkins
