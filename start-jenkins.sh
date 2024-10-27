@@ -20,7 +20,7 @@ error_and_exit() {
     exit "${@: -1}"
 }
 
-# Helper functions to help with downloading Jenkins-related binaries 
+# Helper function to help with downloading Jenkins-related binaries 
 download_artifact() {
     if [ ! -f "./versions/${1}.version" ]; then
         error_and_exit "Root directory does not have \"${1}.version\" to select approriate ${1} version" 1
@@ -46,6 +46,15 @@ download_artifact() {
     fi
 }
 
+# Helper function to ensure only 1 artifact version exist in $ROOT_DIR
+ensure_single_artifact() {
+    if [ $# -ne 1 ]; then
+        error_and_exit "There are more than 1 artifact matching $*" 1
+    else
+        info "Only 1 artifact matching pattern ($*). Continue"
+    fi
+}
+
 # Check if Java installation is available.
 # Else, check if Java installation is Java17 or else.
 # Beginning with the Jenkins 2.463 weekly release (scheduled for release on June 18, 2024), Jenkins requires Java 17 or newer
@@ -68,6 +77,10 @@ fi
 # Can execute the download task either via "curl" or "wget".
 download_artifact "jenkins"
 download_artifact "jenkins-plugin-manager"
+
+# Ensure only 1 version for each artifact to be present 
+ensure_single_artifact jenkins-*.war
+ensure_single_artifact jenkins-plugin-manager-*.jar
 
 # Create directory for Jenkins logs and plugins
 mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d
