@@ -1,8 +1,8 @@
 import jenkins.model.Jenkins;
 
 // Disable builds on controller node by setting executor number to 0.   
-def instance = Jenkins.get()
-controllerNode = instance.getNode('built-in');
+// This should be done after finish execution of seed job.
+def controllerNode = Jenkins.get()
 if (controllerNode) {
     controllerNode.setNumExecutors(0);
     controllerNode.save();
