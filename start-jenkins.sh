@@ -14,9 +14,10 @@ warn() {
 }
 error_and_exit() {
     # Log all given arguments except the last on   
+    # shellcheck disable=SC2145
     echo "[ERROR]" "${@:1:$#-1}. Exit with non-zero code" 
     # last argument as exit code.
-    exit ${@: -1}
+    exit "${@: -1}"
 }
 
 # Helper functions to help with downloading Jenkins-related binaries 
@@ -29,8 +30,9 @@ download_artifact() {
     ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(head --lines=2 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
     ARTIFACT_TEMPLATE_NAME="$(head --lines=3 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
 
-    ARTIFACT_DOWNLOAD_URL=$(eval "echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
-    ARTIFACT_NAME=$(eval "echo \"$ARTIFACT_TEMPLATE_NAME\"")
+    # Interpolate ARTIFACT_VERSION into template variables read from .version files  
+    ARTIFACT_DOWNLOAD_URL=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
+    ARTIFACT_NAME=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_NAME\"")
 
     if [ ! -f "./${ARTIFACT_NAME}" ]; then
         info "Downloading $1..."
