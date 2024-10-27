@@ -2,7 +2,7 @@ import jenkins.model.Jenkins
 import hudson.model.Cause
 import hudson.model.Result
 
-// Trigger seed job
+// Trigger seed job.
 def jenkins = Jenkins.get()
 def job = jenkins.getItemByFullName('seed')
 
@@ -11,17 +11,23 @@ if (job == null) {
     return
 }
 
+// Temporarily allow controller node to execute seed job.
+// Controller node will be disabled for builds in 01-disable-builds-on-controller-node.groovy  
+def controllerNode = Jenkins.get()
+controllerNode.setNumExecutors(1);
+controllerNode.save();
+
 def cause = new Cause.RemoteCause("script", "Triggered by 00-trigger-seed-job.groovy")
 def future = job.scheduleBuild2(0, cause)
 
 if (future != null) {
     println("[INIT] Seed job triggered successfully. Waiting for the job to finish...")
 
-    // Wait until the build is complete
-    // Blocks the script until the build is finished 
+    // Wait until the build is complete.
+    // Blocks the script until the build is finished .
     def build = future.get() 
 
-    // Check the result of the build
+    // Check the result of the build.
     def result = build.getResult()
 
     if (result == Result.SUCCESS) {
