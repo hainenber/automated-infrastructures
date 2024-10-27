@@ -100,7 +100,7 @@ if ls ./jenkins-*.war >/dev/null 2>&1; then
 
     # Configure Groovy init hook scripts
     if [ -d "./hook-scripts/init" ]; then
-        if [ $(ls ./data/init.groovy.d | wc -l | xargs) -gt 0 ]; then
+        if [ "$(find ./data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
             rm -rf ./data/init.groovy.d/*
         fi
         cp ./hook-scripts/init/*.groovy ./data/init.groovy.d
