@@ -42,8 +42,17 @@ plugins:
   - artifactId: ws-cleanup # Workspace Cleanup plugin
     source:
       version: latest
+  - artifactId: ant # Ant
+    source:
+      version: latest
 
   # Custom
   - artifactId: configuration-as-code # Configuration as Code
     source:
       version: latest 
+  - artifactId: docker-plugin # Docker
+    source:
+      version: latest
+  - artifactId: job-dsl # Job DSL
+    source:
+      version: latest

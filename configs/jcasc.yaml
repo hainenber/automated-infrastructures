@@ -1,8 +1,33 @@
 jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code (JCasC)\n\n"
 
+  securityRealm:
+    local:
+      allowsSignup: false # Disable users from creating account through web interface
+      users:
+        - id: ${JENKINS_ADMIN_ID}
+          password: ${JENKINS_ADMIN_PASSWORD}
+
 # Force enable Dark theme
 appearance:
   themeManager:
     disableUserThemes: true
     theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings
+
+# Setup seed job
+jobs:
+  - script: |
+      job('seed') {
+        scm {
+          git {
+            remote {
+              url 'github.com/hainenber/jenkins-labs'
+            }
+          }
+        }
+        steps {
+          jobDsl {
+            target 'jobs/**/*.groovy'
+          }
+        }
+      }
