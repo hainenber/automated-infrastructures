@@ -9,7 +9,20 @@ jenkins:
         - id: ${JENKINS_ADMIN_ID}
           password: ${JENKINS_ADMIN_PASSWORD}
   
-
+  
+# Secrets 
+# 1. (SSH username with private key) Credential to register Multipass VMs as Jenkins agents 
+credentials:
+  system:
+    domainCredentials:
+      - credentials:
+          - basicSSHUserPrivateKey:
+              scope: SYSTEM
+              id: multipass-agent-ssh-username-with-private-key
+              username: jenkins
+              privateKeySource:
+                directEntry:
+                  privateKey: ${file:/secrets/multipass-agent-ssh-key}
 
 # Force enable Dark theme
 appearance:
@@ -18,6 +31,7 @@ appearance:
     theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings
 
 # Setup seed job
+# Source: https://gerg.dev/2020/06/creating-a-job-dsl-seed-job-with-jcasc/
 jobs:
   - script: |
       job('seed') {
