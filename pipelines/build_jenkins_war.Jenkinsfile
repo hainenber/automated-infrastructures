@@ -29,11 +29,11 @@ pipeline {
         }
     }
     post {
-        always {
-            cleanWs()
-        }
         success {
             archiveArtifacts(artifacts: 'war/target/jenkins.war', fingerprint: true)
+        }
+        cleanup {
+            cleanWs()
         }
     }
 }
