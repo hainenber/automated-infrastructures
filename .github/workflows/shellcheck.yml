@@ -3,7 +3,7 @@ name: ShellCheck
 on:
   push:
     branches:
-      - $default-branch
+      - main
 
 jobs:
   shellcheck:
