@@ -30,7 +30,7 @@ pipeline {
     }
     post {
         success {
-            archiveArtifacts(artifacts: 'plugin-management-cli/target/*.jar', fingerprint: true)
+            archiveArtifacts(artifacts: 'plugin-management-cli/target/jenkins-plugin-manager*.jar', fingerprint: true)
         }
         cleanup {
             cleanWs()
