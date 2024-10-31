@@ -83,7 +83,7 @@ ensure_single_artifact jenkins-*.war
 ensure_single_artifact jenkins-plugin-manager-*.jar
 
 # Create directory for Jenkins logs and plugins
-mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d
+mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets
 
 if ls ./jenkins-*.war >/dev/null 2>&1; then
     # Prepare the plugins
@@ -105,6 +105,9 @@ if ls ./jenkins-*.war >/dev/null 2>&1; then
         fi
         cp ./hook-scripts/init/*.groovy ./data/init.groovy.d
     fi
+
+    # Copy local secrets to $JENKINS_HOME for configuration by JCasC
+    cp ./secrets/* ./data/secrets
 
     # Start the Jenkins
     jenkins_log_name="$(date '+%Y-%m-%d-%H')"
