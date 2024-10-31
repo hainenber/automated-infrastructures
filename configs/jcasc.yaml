@@ -10,8 +10,8 @@ jenkins:
           password: ${JENKINS_ADMIN_PASSWORD}
   
   # Nodes
-  # A temporarily permanent node used to, setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
-  # TODO: Configure the node with CloudInit
+  # Permantn nodes used for building Java-based applications
+  # Must be setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
   nodes:
     - permanent:
         name: 'java-app-builder-1'
@@ -21,6 +21,18 @@ jenkins:
         launcher:
           ssh:
             host: '192.168.71.3'
+            credentialsId: multipass-agent-ssh-username-with-private-key
+            sshHostKeyVerificationStrategy:
+              manuallyTrustedKeyVerificationStrategy:
+                  requireInitialManualTrust: false
+    - permanent:
+        name: 'java-app-builder-2'
+        labelString: 'java-app-builder'
+        remoteFS: '/home/jenkins'
+        numExecutors: 1
+        launcher:
+          ssh:
+            host: '192.168.71.4'
             credentialsId: multipass-agent-ssh-username-with-private-key
             sshHostKeyVerificationStrategy:
               manuallyTrustedKeyVerificationStrategy:
