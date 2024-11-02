@@ -29,6 +29,7 @@ conditions:
 targets:
   bumpJenkins:
     name: "jenkins version"
+    scmid: default
     kind: json
     spec:
       file: versions/jenkins.version.json
