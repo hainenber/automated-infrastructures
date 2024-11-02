@@ -22,6 +22,6 @@ jobs:
         env:
           UPDATECLI_GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
       - name: Apply 
-        run: "updatecli diff --config ./updatecli/update-jenkins.yaml --values ./updatecli/values.yaml"
+        run: "updatecli apply --config ./updatecli/update-jenkins.yaml --values ./updatecli/values.yaml"
         env:
           UPDATECLI_GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
