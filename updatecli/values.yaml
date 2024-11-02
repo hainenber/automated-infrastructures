@@ -1,0 +1,9 @@
+---
+github:
+  user: "GitHub Actions Bot"
+  email: "bots@udpatecli.io"
+  owner: "hainenber"
+  repository: "jenkins-labs"
+  token: "UPDATECLI_GITHUB_TOKEN"
+  username: "github-actions"
+  branch: "main"

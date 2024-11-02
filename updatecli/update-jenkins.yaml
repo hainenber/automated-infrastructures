@@ -1,0 +1,44 @@
+name: Update Jenkins version
+
+scms:
+  default:
+    kind: github
+    spec:
+      user: "{{ .github.user }}"
+      email: "{{ .github.email }}"
+      owner: "{{ .github.owner }}"
+      repository: "{{ .github.repository }}"
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      branch: "{{ .github.branch }}"
+
+sources:
+  jenkinsWeekly:
+    name: Get latest Jenkins weekly version
+    kind: jenkins
+    spec:
+      release: weekly
+
+conditions:
+  # Test that the version from source is a weekly release
+  jenkinsWeekly:
+    kind: jenkins
+    spec:
+      release: weekly
+
+targets:
+  bumpJenkins:
+    name: "jenkins version"
+    kind: json
+    spec:
+      file: versions/jenkins.version.json
+      key: version
+
+actions:
+  default:
+    kind: github/pullrequest
+    scmid: default
+    title: Bump Jenkins weekly version to {{ source "jenkinsWeekly" }}
+    spec:
+      labels:
+        - dependencies

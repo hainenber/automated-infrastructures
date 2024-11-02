@@ -1,0 +1,27 @@
+name: Update Jenkins version
+
+on:
+  push:
+    branches:
+      - main
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  update-jenkins:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install UpdateCLI
+        uses: updatecli/updatecli-action@v2
+      - name: Check for latest Jenkins version
+        run: "updatecli diff --config ./updatecli/update-jenkins.yaml --values ./updatecli/values.yaml"
+        env:
+          UPDATECLI_GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
+      - name: Apply 
+        run: "updatecli diff --config ./updatecli/update-jenkins.yaml --values ./updatecli/values.yaml"
+        env:
+          UPDATECLI_GITHUB_TOKEN: "${{ secrets.GITHUB_TOKEN }}"
