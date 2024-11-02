@@ -1,0 +1,5 @@
+{
+    "version": "2.13.2",
+    "download_url": "https://github.com/jenkinsci/plugin-installation-manager-tool/releases/download/${ARTIFACT_VERSION}/jenkins-plugin-manager-${ARTIFACT_VERSION}.jar",
+    "artifact_name": "jenkins-plugin-manager-${ARTIFACT_VERSION}.jar"
+}

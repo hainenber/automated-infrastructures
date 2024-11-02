@@ -6,9 +6,13 @@ A laboratory to explore Jenkins and realize it to the fullest.
 
 ACTIVE
 
-## Usage
+## Prerequisites
 
-NOTE: make sure you have Java 17+ installation on your local machine.
+* Java17+ installation to run Jenkins.
+* [`multipass`](https://multipass.run/) for creating Jenkins agents.
+* [`jq`](https://jqlang.github.io/jq/).
+
+## Usage
 
 Run `./start-jenkins.sh` for the very first time!
 

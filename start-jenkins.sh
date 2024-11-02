@@ -2,7 +2,7 @@
 
 set -eo pipefail
 
-## Command dependencies: java, awk, curl (wget) 
+## Command dependencies: java, awk, curl (wget), jq 
 ## File dependencies: $ROOT_DIR/jenkins.version
 
 # Helper functions for logging 
@@ -26,9 +26,9 @@ download_artifact() {
         error_and_exit "Root directory does not have \"${1}.version\" to select approriate ${1} version" 1
     fi
 
-    ARTIFACT_VERSION="$(head --lines=1 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
-    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(head --lines=2 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
-    ARTIFACT_TEMPLATE_NAME="$(head --lines=3 ./versions/"${1}".version | tail --lines=1 | cut -d" " -f2)"
+    ARTIFACT_VERSION="$(jq -r .version ./versions/"${1}".version.json)"
+    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(jq -r .download_url ./versions/"${1}".version.json)"
+    ARTIFACT_TEMPLATE_NAME="$(jq -r .artifact_name ./versions/"${1}".version.json)"
 
     # Interpolate ARTIFACT_VERSION into template variables read from .version files  
     ARTIFACT_DOWNLOAD_URL=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
