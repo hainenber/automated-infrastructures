@@ -12,6 +12,7 @@ jenkins:
   # Nodes
   # Permantn nodes used for building Java-based applications
   # Must be setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
+  # TODO: replace with homemade Jenkins cloud plugin to provision Multipass VMs
   nodes:
     - permanent:
         name: 'java-app-builder-1'
@@ -20,7 +21,7 @@ jenkins:
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.71.3'
+            host: '192.168.72.8'
             credentialsId: multipass-agent-ssh-username-with-private-key
             sshHostKeyVerificationStrategy:
               manuallyTrustedKeyVerificationStrategy:
@@ -32,7 +33,7 @@ jenkins:
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.71.4'
+            host: '192.168.72.3'
             credentialsId: multipass-agent-ssh-username-with-private-key
             sshHostKeyVerificationStrategy:
               manuallyTrustedKeyVerificationStrategy:
