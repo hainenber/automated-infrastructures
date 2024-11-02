@@ -56,3 +56,6 @@ plugins:
   - artifactId: job-dsl # Job DSL
     source:
       version: latest
+  - artifactId: ansicolor # AnsiColor
+    source:
+      version: latest
