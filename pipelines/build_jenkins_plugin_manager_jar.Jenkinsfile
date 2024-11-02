@@ -1,5 +1,11 @@
 pipeline {
     agent { label 'java-app-builder' }
+
+    options {
+        // Display ANSI escape sequences, including color, to Console Output
+        ansiColor('xterm')
+    }
+
     stages {
         stage('Checkout jenkinsci/plugin-installation-manager-tool') {
             steps {
@@ -18,6 +24,7 @@ pipeline {
             }
         }
     }
+
     post {
         success {
             archiveArtifacts(artifacts: 'plugin-management-cli/target/jenkins-plugin-manager*.jar', fingerprint: true, onlyIfSuccessful: true)
