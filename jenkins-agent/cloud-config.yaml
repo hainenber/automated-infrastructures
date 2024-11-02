@@ -14,3 +14,4 @@ packages:
   - git
   - openjdk-21-jre-headless
   - openjdk-21-jdk-headless
+  - maven
