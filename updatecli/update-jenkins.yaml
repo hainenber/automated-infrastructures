@@ -39,6 +39,8 @@ actions:
     kind: github/pullrequest
     scmid: default
     title: Bump Jenkins weekly version to {{ source "jenkinsWeekly" }}
+    target:
+      - bumpJenkins
     spec:
       labels:
         - dependencies
