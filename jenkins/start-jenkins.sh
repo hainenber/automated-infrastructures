@@ -102,7 +102,7 @@ if ls "${ROOT_DIR}/jenkins-"*".war" >/dev/null 2>&1; then
 
     # Configure Groovy init hook scripts
     if [ -d "${ROOT_DIR}/hook-scripts/init" ]; then
-        if [ "$(find ${ROOT_DIR}/data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
+        if [ "$(find "${ROOT_DIR}"/data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
             rm -rf "${ROOT_DIR}/data/init.groovy.d/"*
         fi
         cp "${ROOT_DIR}/hook-scripts/init/"*.groovy "${ROOT_DIR}/data/init.groovy.d"
