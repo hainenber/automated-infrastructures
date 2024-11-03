@@ -78,7 +78,7 @@ jobs:
         }
         steps {
           jobDsl {
-            targets 'jobs/**/*.groovy'
+            targets 'jenkins/jobs/**/*.groovy'
           }
         }
       }
