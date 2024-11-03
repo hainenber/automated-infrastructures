@@ -4,7 +4,7 @@ pipelineJob('build-jenkins-war') {
       scm {
         git {
           remote {
-            url('https://github.com/hainenber/jenkins-labs.git')
+            url('https://github.com/hainenber/jenkins-lab.git')
           }
           branch('*/main')
         }
