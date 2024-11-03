@@ -85,7 +85,7 @@ ensure_single_artifact jenkins-*.war
 ensure_single_artifact jenkins-plugin-manager-*.jar
 
 # Create directory for Jenkins logs and plugins
-mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets ./data/job_definitions
+mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets
 
 if ls ./jenkins-*.war >/dev/null 2>&1; then
     # Prepare the plugins

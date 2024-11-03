@@ -9,6 +9,11 @@ jenkins:
         - id: ${JENKINS_ADMIN_ID}
           password: ${JENKINS_ADMIN_PASSWORD}
   
+  # Required users to login first
+  authorizationStrategy: 
+    loggedInUsersCanDoAnything:
+      allowAnonymousRead: false
+  
   # Nodes
   # Permantn nodes used for building Java-based applications
   # Must be setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
