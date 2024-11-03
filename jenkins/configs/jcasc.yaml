@@ -56,7 +56,7 @@ credentials:
               username: jenkins
               privateKeySource:
                 directEntry:
-                  privateKey: ${file:secrets/multipass-agent-ssh-key}
+                  privateKey: ${file:${JENKINS_HOME}/secrets/multipass-agent-ssh-key}
 
 # Force enable Dark theme
 appearance:
