@@ -20,6 +20,8 @@ class SeedJob {
         def scriptApproval = ScriptApproval.get()
         scriptApproval.getPendingScripts().clone().each { pendingScript ->
             String scriptHash = pendingScript.getHash()
+            println(pendingScript.script)
+            println(scriptHash)
             if (approvedHashes.contains(scriptHash)) {
                 scriptApproval.approveScript(scriptHash)
             }

@@ -3,7 +3,7 @@ github:
   user: "GitHub Actions Bot"
   email: "bots@udpatecli.io"
   owner: "hainenber"
-  repository: "jenkins-lab"
+  repository: "automated-infrastructures"
   token: "UPDATECLI_GITHUB_TOKEN"
   username: "github-actions"
   branch: "main"

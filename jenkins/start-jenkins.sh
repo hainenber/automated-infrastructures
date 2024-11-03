@@ -36,7 +36,7 @@ download_artifact() {
     ARTIFACT_DOWNLOAD_URL=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
     ARTIFACT_NAME=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_NAME\"")
 
-    if [ ! -f "./${ARTIFACT_NAME}" ]; then
+    if [ ! -f "${ROOT_DIR}/${ARTIFACT_NAME}" ]; then
         info "Downloading $1..."
         if command -v curl >/dev/null 2>&1; then 
             curl --location "${ARTIFACT_DOWNLOAD_URL}" --output "${ARTIFACT_NAME}"
@@ -85,16 +85,16 @@ ensure_single_artifact jenkins-*.war
 ensure_single_artifact jenkins-plugin-manager-*.jar
 
 # Create directory for Jenkins logs and plugins
-mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets
+mkdir -p "${ROOT_DIR}/logs" "${ROOT_DIR}/data" "${ROOT_DIR}/data/plugins" "${ROOT_DIR}/data/init.groovy.d" "${ROOT_DIR}/data/secrets"
 
-if ls ./jenkins-*.war >/dev/null 2>&1; then
+if ls "${ROOT_DIR}/jenkins-"*".war" >/dev/null 2>&1; then
     # Prepare the plugins
     if [ -f "${ROOT_DIR}/configs/plugins.yaml" ]; then
         info "Handling plugins..."
-        java -jar jenkins-plugin-manager-*.jar \
-            --war ./jenkins-*.war \
+        java -jar "${ROOT_DIR}/jenkins-plugin-manager-"*".jar" \
+            --war "${ROOT_DIR}/jenkins-"*".war" \
             --verbose \
-            --plugin-download-directory ./data/plugins \
+            --plugin-download-directory "${ROOT_DIR}/data/plugins" \
             --plugin-file "${ROOT_DIR}/configs/plugins.yaml"
     else
         warn "Configuration file for Jenkins plugins are not found. Handle plugins manually."
@@ -102,16 +102,16 @@ if ls ./jenkins-*.war >/dev/null 2>&1; then
 
     # Configure Groovy init hook scripts
     if [ -d "${ROOT_DIR}/hook-scripts/init" ]; then
-        if [ "$(find ./data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
-            rm -rf ./data/init.groovy.d/*
+        if [ "$(find ${ROOT_DIR}/data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
+            rm -rf "${ROOT_DIR}/data/init.groovy.d/"*
         fi
-        cp "${ROOT_DIR}/hook-scripts/init/"*.groovy ./data/init.groovy.d
+        cp "${ROOT_DIR}/hook-scripts/init/"*.groovy "${ROOT_DIR}/data/init.groovy.d"
     fi
 
     # Copy local secrets to $JENKINS_HOME for configuration by JCasC
-    cp "${ROOT_DIR}/secrets/"* ./data/secrets
+    cp "${ROOT_DIR}/secrets/"* "${ROOT_DIR}/data/secrets"
 
     # Start the Jenkins
     jenkins_log_name="$(date '+%Y-%m-%d-%H')"
-    JENKINS_HOME="./data" CASC_JENKINS_CONFIG="${ROOT_DIR}/configs/jcasc.yaml" java -jar ./jenkins-*.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
+    JENKINS_HOME="${ROOT_DIR}/data" CASC_JENKINS_CONFIG="${ROOT_DIR}/configs/jcasc.yaml" java -jar "${ROOT_DIR}/jenkins-"*".war" 2>&1 | tee /dev/tty >> "${ROOT_DIR}/logs/jenkins-${jenkins_log_name}.log"
 fi

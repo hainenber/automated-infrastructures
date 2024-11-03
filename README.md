@@ -1,6 +1,6 @@
-# Jenkins Lab
+# Automated Infrastructure
 
-A laboratory to explore Jenkins and realize it to the fullest.
+An attempt to create a infrastructure setup by Infrastructure-as-Code approach.
 
 ## Project status
 
@@ -14,7 +14,7 @@ ACTIVE
 
 ## Usage
 
-Run `./start-jenkins.sh` for the very first time!
+Run `bash ./jenkins/start-jenkins.sh` for the very first time!
 
 If you add new Jenkins job definition in `./jobs`, Jenkins will fail to run its seed job as the newly Jenkins job definition
 is not yet approved. You'll need to login to Jenkins, manually approve the job definition and rerun the startup script.
