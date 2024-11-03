@@ -5,6 +5,8 @@ set -eo pipefail
 ## Command dependencies: java, awk, curl (wget), jq 
 ## File dependencies: $ROOT_DIR/jenkins.version
 
+ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+
 # Helper functions for logging 
 info() {
     echo "[INFO]" "$*"
@@ -22,13 +24,13 @@ error_and_exit() {
 
 # Helper function to help with downloading Jenkins-related binaries 
 download_artifact() {
-    if [ ! -f "./versions/${1}.version" ]; then
+    if [ ! -f "${ROOT_DIR}/versions/${1}.version.json" ]; then
         error_and_exit "Root directory does not have \"${1}.version\" to select approriate ${1} version" 1
     fi
 
-    ARTIFACT_VERSION="$(jq -r .version ./versions/"${1}".version.json)"
-    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(jq -r .download_url ./versions/"${1}".version.json)"
-    ARTIFACT_TEMPLATE_NAME="$(jq -r .artifact_name ./versions/"${1}".version.json)"
+    ARTIFACT_VERSION="$(jq -r .version "${ROOT_DIR}"/versions/"${1}".version.json)"
+    ARTIFACT_TEMPLATE_DOWNLOAD_URL="$(jq -r .download_url "${ROOT_DIR}"/versions/"${1}".version.json)"
+    ARTIFACT_TEMPLATE_NAME="$(jq -r .artifact_name "${ROOT_DIR}"/versions/"${1}".version.json)"
 
     # Interpolate ARTIFACT_VERSION into template variables read from .version files  
     ARTIFACT_DOWNLOAD_URL=$(eval "ARTIFACT_VERSION=${ARTIFACT_VERSION} echo \"$ARTIFACT_TEMPLATE_DOWNLOAD_URL\"")
@@ -83,33 +85,33 @@ ensure_single_artifact jenkins-*.war
 ensure_single_artifact jenkins-plugin-manager-*.jar
 
 # Create directory for Jenkins logs and plugins
-mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets
+mkdir -p ./logs ./data ./data/plugins ./data/init.groovy.d ./data/secrets ./data/job_definitions
 
 if ls ./jenkins-*.war >/dev/null 2>&1; then
     # Prepare the plugins
-    if [ -f "./configs/plugins.yaml" ]; then
+    if [ -f "${ROOT_DIR}/configs/plugins.yaml" ]; then
         info "Handling plugins..."
         java -jar jenkins-plugin-manager-*.jar \
             --war ./jenkins-*.war \
             --verbose \
             --plugin-download-directory ./data/plugins \
-            --plugin-file ./configs/plugins.yaml
+            --plugin-file "${ROOT_DIR}/configs/plugins.yaml"
     else
         warn "Configuration file for Jenkins plugins are not found. Handle plugins manually."
     fi
 
     # Configure Groovy init hook scripts
-    if [ -d "./hook-scripts/init" ]; then
+    if [ -d "${ROOT_DIR}/hook-scripts/init" ]; then
         if [ "$(find ./data/init.groovy.d -type f | wc -l | xargs)" -gt "0" ]; then
             rm -rf ./data/init.groovy.d/*
         fi
-        cp ./hook-scripts/init/*.groovy ./data/init.groovy.d
+        cp "${ROOT_DIR}/hook-scripts/init/"*.groovy ./data/init.groovy.d
     fi
 
     # Copy local secrets to $JENKINS_HOME for configuration by JCasC
-    cp ./secrets/* ./data/secrets
+    cp "${ROOT_DIR}/secrets/"* ./data/secrets
 
     # Start the Jenkins
     jenkins_log_name="$(date '+%Y-%m-%d-%H')"
-    JENKINS_HOME="./data" CASC_JENKINS_CONFIG="./configs/jcasc.yaml" java -jar ./jenkins-*.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
+    JENKINS_HOME="./data" CASC_JENKINS_CONFIG="${ROOT_DIR}/configs/jcasc.yaml" java -jar ./jenkins-*.war 2>&1 | tee /dev/tty >> "./logs/jenkins-${jenkins_log_name}.log"
 fi
