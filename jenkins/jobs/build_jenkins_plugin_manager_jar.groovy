@@ -9,7 +9,7 @@ pipelineJob('build-jenkins-plugin-manager-war') {
           branch('*/main')
         }
       }
-      scriptPath('pipelines/build_jenkins_plugin_manager_jar.Jenkinsfile')
+      scriptPath('jenkins/pipelines/build_jenkins_plugin_manager_jar.Jenkinsfile')
       lightweight()
     }
   }

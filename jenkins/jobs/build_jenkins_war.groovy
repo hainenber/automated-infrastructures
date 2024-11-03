@@ -9,7 +9,7 @@ pipelineJob('build-jenkins-war') {
           branch('*/main')
         }
       }
-      scriptPath('pipelines/build_jenkins_war.Jenkinsfile')
+      scriptPath('jenkins/pipelines/build_jenkins_war.Jenkinsfile')
       lightweight()
     }
   }
