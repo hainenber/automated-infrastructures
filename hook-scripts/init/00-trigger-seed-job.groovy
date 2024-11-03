@@ -13,12 +13,12 @@ class SeedJob {
     static void approvePendingScriptsInSeedJob() {
         def approvedHashes = [
             // build_jenkins_plugin_manager_jar.groovy
-            'SHA512:fea3f17ae00259d0e9fbe1cc6fc65e16a507a11ed2970744f627b9099ccde2ca7c8aca772d4ebec2961e9f637a03bd50957cbeaa0b746f96a97aa64f508b7bae',
+            'SHA512:1f5ae642ddb6a8f130d865fafd6ee2eea350b76ff36212ed551a2eea7c39e2c7c899954f4bc18dc624b713214b46ddee7c5fab1a235f5430ec3c9f1200cd6640',
             // build_jenkins_war.groovy
-            'SHA512:49410e05c64660d65a1687abaa8aa15fe8457658fef96ee832fb75e9e472c658c3a6a42183aab43f22dbdbbfaac57794ae3968a7bbc96de3a251db0f9c952777'
+            'SHA512:79aae170f1b91185050bdaa30d512d2a8416d70224a2062f510ce6f817eea249563de00bee62c4bae15af0dca25f68e708abe4efdbe6fd0b438a5b91aac59ab8',
         ]
         def scriptApproval = ScriptApproval.get()
-        scriptApproval.getPendingScripts().each { pendingScript ->
+        scriptApproval.getPendingScripts().clone().each { pendingScript ->
             String scriptHash = pendingScript.getHash()
             if (approvedHashes.contains(scriptHash)) {
                 scriptApproval.approveScript(scriptHash)
