@@ -15,3 +15,55 @@ packages:
   - openjdk-21-jre-headless
   - openjdk-21-jdk-headless
   - maven
+
+# Pre-create Maven settings that links to mirrors in Jenkins agent home directory
+write_files:
+  - path: /home/jenkins/.m2/settings.xml
+    content: |
+      <settings>
+        <mirrors>
+          <mirror>
+        <!--This sends everything else to /public -->
+          <id>central</id>
+          <mirrorOf>central</mirrorOf>
+          <url>http://192.168.72.1:8081/repository/maven-public/</url>
+        </mirror>
+          <mirror>
+          <!--This sends everything else to /public -->
+          <id>jenkins-public</id>
+          <mirrorOf>jenkins-public</mirrorOf>
+          <url>http://192.168.72.1:8081/repository/jenkins-public/</url>
+        </mirror>
+        </mirrors>
+        <profiles>
+          <profile>
+          <id>nexus</id>
+          <!--Enable snapshots for the built in central repo to direct -->
+          <!--all requests to nexus via the mirror -->
+          <repositories>
+        <repository>
+        <id>central</id>
+        <url>http://central</url>
+        <releases><enabled>true</enabled></releases>
+        <snapshots><enabled>true</enabled></snapshots>
+        </repository>
+          </repositories>
+          <pluginRepositories>
+        <pluginRepository>
+        <id>central</id>
+        <url>http://central</url>
+        <releases><enabled>true</enabled></releases>
+        <snapshots><enabled>true</enabled></snapshots>
+        </pluginRepository>
+          </pluginRepositories>
+          </profile>
+        </profiles>
+        <activeProfiles>
+          <!--make the profile active all the time -->
+          <activeProfile>nexus</activeProfile>
+        <activeProfiles>
+      </settings>
+    owner: jenkins:users
+    permissions: '0644'
+    encoding: text/plain
+    defer: true
