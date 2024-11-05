@@ -15,7 +15,7 @@ jenkins:
       allowAnonymousRead: false
   
   # Nodes
-  # Permantn nodes used for building Java-based applications
+  # Permanent nodes used for building Java-based applications
   # Must be setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
   # TODO: replace with homemade Jenkins cloud plugin to provision Multipass VMs
   nodes:
@@ -28,9 +28,6 @@ jenkins:
           ssh:
             host: '192.168.72.8'
             credentialsId: multipass-agent-ssh-username-with-private-key
-            sshHostKeyVerificationStrategy:
-              manuallyTrustedKeyVerificationStrategy:
-                  requireInitialManualTrust: false
     - permanent:
         name: 'java-app-builder-2'
         labelString: 'java-app-builder'
@@ -38,11 +35,8 @@ jenkins:
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.72.3'
+            host: '192.168.72.12'
             credentialsId: multipass-agent-ssh-username-with-private-key
-            sshHostKeyVerificationStrategy:
-              manuallyTrustedKeyVerificationStrategy:
-                  requireInitialManualTrust: false
   
 # Secrets 
 # 1. (SSH username with private key) Credential to register Multipass VMs as Jenkins agents 
@@ -63,6 +57,12 @@ appearance:
   themeManager:
     disableUserThemes: true
     theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings
+
+# Accept first SSH connection from Jenkins agent and verify following connections with 
+# the first key.
+security:
+  gitHostKeyVerificationConfiguration:
+    sshHostKeyVerificationStrategy: acceptFirstConnectionStrategy
 
 # Setup seed job
 # Source: https://gerg.dev/2020/06/creating-a-job-dsl-seed-job-with-jcasc/
