@@ -1,0 +1,13 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "Utility scripts to perform BAU operations",
+  "main": "index.js",
+  "repository": "https://github.com/hainenber/automated-infrastructures",
+  "author": "hainenber",
+  "type": "module",
+  "license": "MIT",
+  "dependencies": {
+    "octokit": "^4.0.2"
+  }
+}
