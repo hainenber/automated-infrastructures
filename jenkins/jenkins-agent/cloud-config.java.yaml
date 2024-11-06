@@ -4,6 +4,7 @@ users:
   - default
   - name: jenkins
     primary_group: users
+    shell: /bin/bash 
     lock_passwd: true
     ssh_authorized_keys:
       - ssh-rsa AAAAB3NzaC1yc2EAAAADAQABAAACAQDBcqtJZZ4fWGnnxAWQ2BTmyEhKZvTyFqcO5FhnwNRg/yaeA+GVb7G5uRxmjxq7fGtQgvERb1CIo4Kwk9k+STXX1zS1NZQ3fmBkbRJaOkrP2VuqJT4sh4nV4Uf7mSEhU35wGsED3i/VsrZdT8osTAaDccYEORhs+r0MVOcVb5Wt0CJVydhqeEbzHwHL6fbiYxYbyu+hz8zuDwLcs3CyWNjlGB47xp5XfADIrXG8SXdKDgb4lmmrGD/du858buZeDcT07XKFjcwiJsRVxUBcSZWgvMmNrtwWHtRpKh7Q9b9EjdDOynaQxyzElp9KQiE9x1ZkbeRk6fYyFhFfHMBjm6nAtXKWv0EB/+5/ChpS2a9Y0LrYO7dq0jA+/zyTpUDVcQJY4WSal196j7bhghdMtPz73HtIvjwkTWsU2CpHpl21JdfehtUVr09FodUW0tdRJ09lA7mImsL5jHodTkxNAVkye3j3dw/Yk3S3N8b1rczyzOuDGnGRB+UOdP17pJEizLIwGtrUccAH4khVql/heVHiyxKCSjDg2UsmFC9OCDEWvfA0vErjf7fgumh6MLBIrAEMqtzs9D9Y4+zNdaCIRK2Adk2YUuuPJjfbs6lCEcBvkGt37r+flJ5Bzv6AxbO9E2sG4U03fWaabjxYefURSOGL9YJldWMvu6ruZ9pMB0xO7w== dotronghai@192.168.1.4
