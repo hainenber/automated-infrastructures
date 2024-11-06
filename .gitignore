@@ -13,3 +13,10 @@ data/
 
 # Locally stored secrets
 secrets/
+
+# node_modules
+node_modules
+
+# Sonatype Nexus installation
+sonatype/nexus-*
+sonatype/sonatype-work/nexus3
