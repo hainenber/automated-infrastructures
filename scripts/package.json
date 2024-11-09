@@ -7,6 +7,9 @@
   "author": "hainenber",
   "type": "module",
   "license": "MIT",
+  "scripts": {
+    "sync_forked_repos": "node sync-forked-repos.js"
+  },
   "dependencies": {
     "octokit": "^4.0.2"
   }
