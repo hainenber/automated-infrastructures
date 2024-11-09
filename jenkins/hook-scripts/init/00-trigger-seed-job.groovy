@@ -16,12 +16,17 @@ class SeedJob {
             'SHA512:57264c3e077e5960db94c62e5932ef69e7aad9ff972ee1afb4a339cd8f41a0d92ee6a8b22fb008674fbbed5c2b3cc12c0434fe78826260fb48b252d02f2d3c59',
             // build_jenkins_war.groovy
             'SHA512:d69efa061ea127dec87f4ae9f0b0a93ff60f91e4c87e4765e30d861f572f503d9d676bf23d0b4ea18042927bf5a77119d20b86586ed86128b4c9aac717e7a5e8',
+            // sync_forked_repos.groovy
+            'SHA512:7599099472200bbffdf93f106c23c4bebfc9163c1fc0cae4ad696c46e64c478596c6c1d4fb9897719fb1abbbf4f1e7b10a88c5925d2461251435446dad53c203',
         ]
         def scriptApproval = ScriptApproval.get()
         scriptApproval.getPendingScripts().clone().each { pendingScript ->
             String scriptHash = pendingScript.getHash()
             if (approvedHashes.contains(scriptHash)) {
                 scriptApproval.approveScript(scriptHash)
+            } else {
+                println(pendingScript.script)
+                println(scriptHash)
             }
         }
     }
