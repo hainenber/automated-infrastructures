@@ -32,7 +32,7 @@ targets:
     scmid: default
     kind: json
     spec:
-      file: versions/jenkins.version.json
+      file: jenkins/versions/jenkins.version.json
       key: version
 
 actions:
