@@ -18,16 +18,18 @@ pipeline {
                 ])
             }
         }
-        step('Install npm dependencies') {
-            dir('scripts') {
-                steps {
-                    sh 'npm install'
+        stage('Install npm dependencies') {
+            steps {
+                dir('scripts') {
+                    steps {
+                        sh 'npm install'
+                    }
                 }
             }
         }
         stage('Synchronize forked repos with their upstream') {
-            dir('scripts') {
-                steps {
+            steps {
+                dir('scripts') {
                     sh 'npm run sync_forked_repos'  
                 }
             }
