@@ -13,4 +13,6 @@ package_update: true
 package_upgrade: true
 packages:
   - git
-  - node
+  - openjdk-21-jre-headless
+  - openjdk-21-jdk-headless
+  - nodejs
