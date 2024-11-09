@@ -21,16 +21,19 @@ pipeline {
         stage('Install npm dependencies') {
             steps {
                 dir('scripts') {
-                    steps {
-                        sh 'npm install'
-                    }
+                    sh 'npm install'
                 }
             }
         }
         stage('Synchronize forked repos with their upstream') {
             steps {
-                dir('scripts') {
-                    sh 'npm run sync_forked_repos'  
+                withCredentials([
+                    credentialsId: 'sync-forked-repos',
+                    variable: 'GITHUB_ACCESS_TOKEN'
+                ]) {
+                    dir('scripts') {
+                       sh 'npm run sync_forked_repos'
+                    }
                 }
             }
         }
