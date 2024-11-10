@@ -17,3 +17,8 @@ packages:
   - openjdk-21-jdk-headless
   - nodejs
   - npm
+
+# Configure to use self-hosted Sonatype Nexus as npm mirror.
+runcmd:
+  - npm config set -g registry http://192.168.72.1:8081/repository/npm-proxy
+  - npm config set -g audit false
