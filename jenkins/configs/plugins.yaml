@@ -45,6 +45,9 @@ plugins:
   - artifactId: ant # Ant
     source:
       version: latest
+  - artifactId: email-ext # Email Extension
+    source:
+      version: latest
 
   # Custom
   - artifactId: configuration-as-code # Configuration as Code

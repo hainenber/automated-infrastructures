@@ -29,13 +29,13 @@ jenkins:
             host: '192.168.72.8'
             credentialsId: multipass-agent-ssh-username-with-private-key
     - permanent:
-        name: 'java-app-builder-2'
-        labelString: 'java-app-builder'
+        name: 'javascript-app-builder-1'
+        labelString: 'javascript-app-builder'
         remoteFS: '/home/jenkins'
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.72.12'
+            host: '192.168.72.15'
             credentialsId: multipass-agent-ssh-username-with-private-key
   
 # Secrets 
@@ -51,8 +51,14 @@ credentials:
               privateKeySource:
                 directEntry:
                   privateKey: ${file:${JENKINS_HOME}/secrets/multipass-agent-ssh-key}
+              description: "SSH private key to allow Jenkins controller connecting with Jenkins agent"
+          - string:
+              scope: GLOBAL
+              id: sync-forked-repos
+              secret: ${file:${JENKINS_HOME}/secrets/sync-forked-repos-github-token.secret}
+              description: "Fine-grained GitHub access token to sync forked repos with their upstream"
 
-# Force enable Dark theme
+# Enable Dark theme by force.
 appearance:
   themeManager:
     disableUserThemes: true
