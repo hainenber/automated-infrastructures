@@ -1,11 +1,5 @@
 import { Octokit } from 'octokit';
 
-// Repos blacklisted from upstream synchronization due to diversion
-const blacklisted = [
-    603697162, // prometheus/procfs
-    592268321, // VictoriaMetrics/ansible-victoriametrics
-];
-
 (async () => {
     // Setup Octokit (GH) client
     const octokit = new Octokit({ auth: process.env.GITHUB_ACCESS_TOKEN });
@@ -19,7 +13,7 @@ const blacklisted = [
         username: login,
         headers: commonHeaders,
     }))
-    .filter(repoData => repoData['fork'] === true && !blacklisted.includes(repoData['id']))
+    .filter(repoData => repoData['fork'] === true)
     .map(repoData => ({
         id: repoData['id'],
         name: String(repoData['name']),
