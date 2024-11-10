@@ -28,8 +28,10 @@ pipeline {
         stage('Synchronize forked repos with their upstream') {
             steps {
                 withCredentials([
-                    credentialsId: 'sync-forked-repos',
-                    variable: 'GITHUB_ACCESS_TOKEN'
+                    string(
+                        credentialsId: 'sync-forked-repos',
+                        variable: 'GITHUB_ACCESS_TOKEN',
+                    )
                 ]) {
                     dir('scripts') {
                        sh 'npm run sync_forked_repos'

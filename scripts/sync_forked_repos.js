@@ -62,6 +62,7 @@ const blacklisted = [
             'GET /repos/{owner}/{repo}/compare/{basehead}', {
                 owner: login,
                 repo: forkedRepoData.full_name.split('/')[1],
+                per_page: 100,
                 basehead: `${forkedRepoData.default_fork_branch}...${forkedRepoData.upstream.replace('/', ':')}:${forkedRepoData.default_upstream_branch}`
             })
         )
@@ -81,7 +82,6 @@ const blacklisted = [
         }
         console.groupEnd()
 
-        console.log()
         try {
            console.log(`[INFO] Synchronizing ${forkedRepoUrl}...`)
            await octokit.request(
@@ -96,6 +96,9 @@ const blacklisted = [
         } catch (e) {
             console.log(`[ERROR] ❌ Error synchronizing upstream to ${forkedRepoUrl}: ${e}`)
             throw e;
+        } finally {
+            console.log()
+            console.log()
         }
     }
 })();
