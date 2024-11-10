@@ -28,6 +28,9 @@ jenkins:
           ssh:
             host: '192.168.72.8'
             credentialsId: multipass-agent-ssh-username-with-private-key
+            sshHostKeyVerificationStrategy: 
+              manuallyTrustedKeyVerificationStrategy:
+                requireInitialManualTrust: false
     - permanent:
         name: 'javascript-app-builder-1'
         labelString: 'javascript-app-builder'
@@ -37,6 +40,9 @@ jenkins:
           ssh:
             host: '192.168.72.15'
             credentialsId: multipass-agent-ssh-username-with-private-key
+            sshHostKeyVerificationStrategy: 
+              manuallyTrustedKeyVerificationStrategy:
+                requireInitialManualTrust: false
   
 # Secrets 
 # 1. (SSH username with private key) Credential to register Multipass VMs as Jenkins agents 
