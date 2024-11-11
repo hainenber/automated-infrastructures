@@ -1,14 +1,15 @@
 {
-  "name": "scripts",
+  "name": "automated-infrastructures",
   "version": "1.0.0",
-  "description": "Utility scripts to perform BAU operations",
+  "description": "An attempt to create a infrastructure setup by Infrastructure-as-Code approach.",
   "main": "index.js",
   "repository": "https://github.com/hainenber/automated-infrastructures",
   "author": "hainenber",
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "sync_forked_repos": "node sync_forked_repos.js"
+    "start": "node start.js",
+    "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
   "dependencies": {
     "octokit": "^4.0.2"
