@@ -24,6 +24,7 @@ import { Octokit } from 'octokit';
     // Disable GH action for forked repos 
     for (const repoData of forkedRepoData) {
         try {
+            console.log(`[INFO] Disabling GitHub Actions runner for ${repoData.full_name}...`)
             await octokit.request('PUT /repos/{owner}/{repo}/actions/permissions', {
                 owner: login,
                 repo: repoData.name,
@@ -31,8 +32,10 @@ import { Octokit } from 'octokit';
                 headers: commonHeaders,
             });
             console.log(`[INFO] ✅ Disable GitHub Actions runner for ${repoData.full_name}`)
+            console.log()
         } catch (e) {
             console.log(`[ERROR] ❌ Error disabling GitHub Actions runner for ${repoData.full_name}: ${e}`)
+            console.log()
         }
     }
 })();
