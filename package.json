@@ -9,9 +9,16 @@
   "license": "MIT",
   "scripts": {
     "start": "node start.js",
+    "lint-fix": "npx prettier . --check",
     "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
   "dependencies": {
+    "@logtape/logtape": "^0.7.1",
+    "es-toolkit": "^1.27.0",
+    "execa": "^9.5.1",
     "octokit": "^4.0.2"
+  },
+  "devDependencies": {
+    "prettier": "^3.3.3"
   }
 }
