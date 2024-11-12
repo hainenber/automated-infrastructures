@@ -23,10 +23,7 @@ const blacklisted = [
       headers: commonHeaders,
     })
   )
-    .filter(
-      (repoData) =>
-        repoData["fork"] === true && !blacklisted.includes(repoData["id"]),
-    )
+    .filter((repoData) => repoData["fork"] === true && !blacklisted.includes(repoData["id"]))
     .map((repoData) => ({
       id: repoData["id"],
       name: String(repoData["name"]),
@@ -82,17 +79,10 @@ const blacklisted = [
   // List out commits and perform sync
   for (const rawCommitData of commitsBehindUpstream) {
     const commitData = rawCommitData[0];
-    const commitMessages = commitData["commits"].map(
-      (i) => i["commit"]["message"].split("\n")[0],
-    );
+    const commitMessages = commitData["commits"].map((i) => i["commit"]["message"].split("\n")[0]);
     const forkedRepoUrl = commitData["html_url"].split("/compare/")[0];
-    const forkedRepoName = commitData["html_url"]
-      .split("/compare/")[0]
-      .split("/")
-      .at(-1);
-    const forkedRepoBranch = commitData["html_url"]
-      .split("/compare/")[1]
-      .split("...")[0];
+    const forkedRepoName = commitData["html_url"].split("/compare/")[0].split("/").at(-1);
+    const forkedRepoBranch = commitData["html_url"].split("/compare/")[1].split("...")[0];
     console.log(`✅ ${forkedRepoUrl}`);
     console.group();
     for (const [index, commitMesage] of commitMessages.entries()) {
@@ -110,9 +100,7 @@ const blacklisted = [
       });
       console.log(`[INFO] ✅ Done synchronizing upstream to ${forkedRepoUrl}`);
     } catch (e) {
-      console.log(
-        `[ERROR] ❌ Error synchronizing upstream to ${forkedRepoUrl}: ${e}`,
-      );
+      console.log(`[ERROR] ❌ Error synchronizing upstream to ${forkedRepoUrl}: ${e}`);
       throw e;
     } finally {
       console.log();
