@@ -52,7 +52,7 @@ plugins:
   # Custom
   - artifactId: configuration-as-code # Configuration as Code
     source:
-      version: latest 
+      version: latest
   - artifactId: docker-plugin # Docker
     source:
       version: latest

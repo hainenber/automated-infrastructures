@@ -1,51 +1,51 @@
 jenkins:
   systemMessage: "Jenkins configured automatically by Jenkins Configuration as Code (JCasC)\n\n"
 
-  # Configure Jenkins admin users to avoid creating one in 1st init 
+  # Configure Jenkins admin users to avoid creating one in 1st init
   securityRealm:
     local:
       allowsSignup: false # Disable users from creating account through web interface
       users:
         - id: ${JENKINS_ADMIN_ID}
           password: ${JENKINS_ADMIN_PASSWORD}
-  
+
   # Required users to login first
-  authorizationStrategy: 
+  authorizationStrategy:
     loggedInUsersCanDoAnything:
       allowAnonymousRead: false
-  
+
   # Nodes
   # Permanent nodes used for building Java-based applications
   # Must be setup beforehand by Multipass (Java installation, pubkey trust, et cetera)
   # TODO: replace with homemade Jenkins cloud plugin to provision Multipass VMs
   nodes:
     - permanent:
-        name: 'java-app-builder-1'
-        labelString: 'java-app-builder'
-        remoteFS: '/home/jenkins'
+        name: "java-app-builder-1"
+        labelString: "java-app-builder"
+        remoteFS: "/home/jenkins"
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.72.8'
+            host: "192.168.72.8"
             credentialsId: multipass-agent-ssh-username-with-private-key
-            sshHostKeyVerificationStrategy: 
+            sshHostKeyVerificationStrategy:
               manuallyTrustedKeyVerificationStrategy:
                 requireInitialManualTrust: false
     - permanent:
-        name: 'javascript-app-builder-1'
-        labelString: 'javascript-app-builder'
-        remoteFS: '/home/jenkins'
+        name: "javascript-app-builder-1"
+        labelString: "javascript-app-builder"
+        remoteFS: "/home/jenkins"
         numExecutors: 1
         launcher:
           ssh:
-            host: '192.168.72.15'
+            host: "192.168.72.15"
             credentialsId: multipass-agent-ssh-username-with-private-key
-            sshHostKeyVerificationStrategy: 
+            sshHostKeyVerificationStrategy:
               manuallyTrustedKeyVerificationStrategy:
                 requireInitialManualTrust: false
-  
-# Secrets 
-# 1. (SSH username with private key) Credential to register Multipass VMs as Jenkins agents 
+
+# Secrets
+# 1. (SSH username with private key) Credential to register Multipass VMs as Jenkins agents
 credentials:
   system:
     domainCredentials:
@@ -70,7 +70,7 @@ appearance:
     disableUserThemes: true
     theme: "darkSystem" # use 'dark' for forcing the dark theme regardless of OS settings
 
-# Accept first SSH connection from Jenkins agent and verify following connections with 
+# Accept first SSH connection from Jenkins agent and verify following connections with
 # the first key.
 security:
   gitHostKeyVerificationConfiguration:
