@@ -9,7 +9,7 @@
   "license": "MIT",
   "scripts": {
     "start-nexus": "node scripts/start-nexus.js",
-    "lint-fix": "npx prettier . --check",
+    "lint-fix": "npx prettier . --write",
     "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
   "dependencies": {
