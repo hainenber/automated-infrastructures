@@ -8,7 +8,7 @@
   "type": "module",
   "license": "MIT",
   "scripts": {
-    "start": "node start.js",
+    "start-nexus": "node scripts/start-nexus.js",
     "lint-fix": "npx prettier . --check",
     "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
