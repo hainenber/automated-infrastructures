@@ -8,6 +8,7 @@ ACTIVE
 
 ## Prerequisites
 
+- Node.js v22+ to run init scripts.
 - Java17+ installation to run Jenkins.
 - [`multipass`](https://multipass.run/) for creating Jenkins agents.
 - [`jq`](https://jqlang.github.io/jq/).
@@ -16,17 +17,18 @@ ACTIVE
 
 ### Jenkins
 
-Run `bash ./jenkins/start-jenkins.sh` for the very first time!
+Run `npm run start-jenkins` for the very first time!
 
 If you add new Jenkins job definition in `./jobs`, Jenkins will fail to run its seed job as the newly Jenkins job definition
 is not yet approved. You'll need to login to Jenkins, manually approve the job definition and rerun the startup script.
 
 ### Sonatype Nexus
 
-Run `bash ./sonatype/start-nexus.sh` to setup repository/artifact management Sonatype Nexus
+Run `npm run start-nexus` to setup repository/artifact management Sonatype Nexus
 
 ## SBOMs
 
+- [Node.js, a JavaScript runtime](https://nodejs.org)
 - [Java](https://www.oracle.com/java/)
 - [Multipass](https://multipass.run/)
 - [`jq`](https://jqlang.github.io/jq/)
