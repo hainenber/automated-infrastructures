@@ -9,6 +9,7 @@
   "license": "MIT",
   "scripts": {
     "start-nexus": "node scripts/start-nexus.js",
+    "start-jenkins": "node scripts/start-jenkins.js",
     "lint-fix": "npx prettier . --write",
     "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
@@ -16,7 +17,10 @@
     "@logtape/logtape": "^0.7.1",
     "es-toolkit": "^1.27.0",
     "execa": "^9.5.1",
-    "octokit": "^4.0.2"
+    "glob": "^11.0.0",
+    "mustache": "^4.2.0",
+    "octokit": "^4.0.2",
+    "rimraf": "^6.0.1"
   },
   "devDependencies": {
     "prettier": "^3.3.3"

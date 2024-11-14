@@ -11,7 +11,8 @@ export const generateLogFilenameWithTimestamp = (service) => {
   return `${service}-${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDay()}.log`;
 };
 
-export const fileExists = path => statSync(path, {throwIfNoEntry: false})
+export const fileExists = (path) => statSync(path, { throwIfNoEntry: false });
+export const folderExists = (path) => statSync(path, { throwIfNoEntry: false }).isDirectory();
 
 export const getArtifactVersionData = (service) => {
   const artifactVersionFolderPath = cwd();
