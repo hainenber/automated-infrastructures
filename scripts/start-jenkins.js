@@ -1,8 +1,9 @@
 import { execa } from "execa";
 import { join as pathJoin } from "path";
-import { cpSync, mkdirSync, readdirSync, writeFileSync } from "fs";
+import { writeFile } from "fs/promises";
+import { cpSync, mkdirSync, readdirSync } from "fs";
 import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
-import { head, isNil, isNotNil } from "es-toolkit";
+import { drop, head, isNil, isNotNil } from "es-toolkit";
 import { cwd } from "process";
 import {
   fileExists,
@@ -10,6 +11,7 @@ import {
   generateLogFilenameWithTimestamp,
   getArtifactVersionData,
   PROJECT_NAME,
+  VERSION_LIMIT,
 } from "./utils.js";
 import { Readable } from "stream";
 import { globSync } from "glob";
@@ -17,8 +19,7 @@ import { rimrafSync } from "rimraf";
 
 // Constants
 const SERVICE = "jenkins";
-const VERSION_LIMIT = 3;
-const JENKINS_MINIMAL_JAVA_VERSION = "17";
+const JENKINS_MINIMAL_JAVA_VERSION = 17;
 
 const ROOT_DIR = cwd();
 const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
@@ -42,12 +43,28 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   const { download_url, artifact_name, version } = versionData;
   const artifactPath = pathJoin(jenkinsProjectPath, artifact_name);
   if (!fileExists(artifactPath)) {
-    logger.info(`Downloading ${SERVICE} ${version}`);
+    logger.info(`Not found ${SERVICE}-${version}. Downloading ${artifact_name} from ${download_url}`);
     const response = await fetch(download_url);
+    if (!response.ok) {
+      logger.fatal(`Failed to fetch ${artifact_name}: ${response.statusText}`);
+    }
     const stream = Readable.fromWeb(response.body);
-    writeFileSync(artifactPath, stream);
+    await writeFile(artifactPath, stream);
   } else {
     logger.info(`${artifact_name} exists. Skip download`);
+  }
+
+  // Check if existing Jenkins-related binaries count have reaching limit or not (3).
+  const existingJenkinsBinariesCount = globSync(pathJoin(jenkinsProjectPath, `${SERVICE}-*.war`));
+  if (existingJenkinsBinariesCount.length > VERSION_LIMIT) {
+    logger.warn(
+      `Found multiple ${SERVICE} binaries. System will keep the last ${VERSION_LIMIT} and delete the remaining.`,
+    );
+    for (const removingJenkinsBinaryPath of drop(existingJenkinsBinariesCount, VERSION_LIMIT - 1)) {
+      logger.info(`Deleting ${removingJenkinsBinaryPath}`);
+      rimrafSync(removingJenkinsBinaryPath);
+      logger.info(`Deleted ${removingJenkinsBinaryPath}`);
+    }
   }
 
   // Check if Java installation is available.
@@ -67,7 +84,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     const javaVersionComponents = javaVersion.split(".");
     const javaMajorVersion =
       head(javaVersionComponents) === "1" ? javaVersionComponents.at(1) : head(javaVersionComponents);
-    if (parseInt(javaMajorVersion, 10) < 17) {
+    if (parseInt(javaMajorVersion, 10) < JENKINS_MINIMAL_JAVA_VERSION) {
       logger.fatal(`Current machine has Java version that is less than required 17 (version: ${javaMajorVersion})`);
       process.exit(1);
     }
@@ -106,17 +123,24 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   const configuredInitHookScriptDir = pathJoin(jenkinsProjectPath, "data", "init.groovy.d");
   if (folderExists(backupInitHookScriptDir)) {
     if (readdirSync(configuredInitHookScriptDir).length > 0) {
+      logger.info(`Deleting all files in ${configuredInitHookScriptDir}`);
       rimrafSync(`${configuredInitHookScriptDir}/*`);
+      logger.info(`Deleted all files in ${configuredInitHookScriptDir}`);
     }
     cpSync(backupInitHookScriptDir, configuredInitHookScriptDir, { recursive: true });
   }
 
   // Copy local secrets to $JENKINS_HOME for configuration by JCasC
+  const localSecretPath = pathJoin(jenkinsProjectPath, "secrets");
+  const configuredSecretPath = pathJoin(jenkinsProjectPath, "data", "secrets");
+  logger.info(`Copying local secrets in ${localSecretPath} to ${configuredSecretPath}`);
   cpSync(pathJoin(jenkinsProjectPath, "secrets"), pathJoin(jenkinsProjectPath, "data", "secrets"), { recursive: true });
+  logger.info(`Copied local secrets in ${localSecretPath} to ${configuredSecretPath}`);
 
   // Start Jenkins
-  const jenkinsBinary = head(globSync(pathJoin(jenkinsProjectPath, "jenkins-*.war")));
+  const jenkinsBinary = pathJoin(jenkinsProjectPath, artifact_name);
   const jenkinsLogFilename = generateLogFilenameWithTimestamp(SERVICE);
+  logger.info(`Running ${SERVICE}`);
   await execa({
     cwd: jenkinsProjectPath,
     env: {

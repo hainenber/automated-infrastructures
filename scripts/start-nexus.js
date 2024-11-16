@@ -5,11 +5,10 @@ import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
 import { head } from "es-toolkit";
 import { homedir } from "os";
 import { cwd } from "process";
-import { generateLogFilenameWithTimestamp, PROJECT_NAME } from "./utils.js";
+import { generateLogFilenameWithTimestamp, PROJECT_NAME, VERSION_LIMIT } from "./utils.js";
 
 // Constants
 const SERVICE = "nexus";
-const VERSION_LIMIT = 3;
 const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
 
 (async () => {
@@ -32,9 +31,7 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
     logger.fatal("Not found any Nexus directory");
     process.exit(1);
   } else if (sonatypeBinaryPaths.length > 3) {
-    logger.warn(
-      `Found more than 1 Nexus directory ${sonatypeBinaryPaths}. Please keep them to minimal ${VERSION_LIMIT}`,
-    );
+    logger.warn(`Found multiple Nexus directory ${sonatypeBinaryPaths}. Please keep them to minimal ${VERSION_LIMIT}`);
   }
 
   const sonatypeBinaryPath = head(sonatypeBinaryPaths);

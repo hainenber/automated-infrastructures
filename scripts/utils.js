@@ -4,6 +4,7 @@ import { join as pathJoin } from "path";
 import { cwd } from "process";
 import { fromPairs } from "es-toolkit/compat";
 
+export const VERSION_LIMIT = 3;
 export const PROJECT_NAME = "auto-infra";
 
 export const generateLogFilenameWithTimestamp = (service) => {
