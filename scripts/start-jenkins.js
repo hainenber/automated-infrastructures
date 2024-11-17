@@ -134,7 +134,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   const localSecretPath = pathJoin(jenkinsProjectPath, "secrets");
   const configuredSecretPath = pathJoin(jenkinsProjectPath, "data", "secrets");
   logger.info(`Copying local secrets in ${localSecretPath} to ${configuredSecretPath}`);
-  cpSync(pathJoin(jenkinsProjectPath, "secrets"), pathJoin(jenkinsProjectPath, "data", "secrets"), { recursive: true });
+  cpSync(pathJoin(jenkinsProjectPath, "secrets"), configuredSecretPath, { recursive: true });
   logger.info(`Copied local secrets in ${localSecretPath} to ${configuredSecretPath}`);
 
   // Start Jenkins
