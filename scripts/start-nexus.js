@@ -65,7 +65,7 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
   const nexusLogFilename = generateLogFilenameWithTimestamp(SERVICE);
   await execa({
     cwd: sonatypeBinaryPath,
-    env: { INSTALL4J_HOME: jvmCandidate },
+    env: { INSTALL4J_JAVA_HOME: jvmCandidate },
     stdout: ["inherit", { file: pathJoin(sonatypeLogPath, nexusLogFilename) }],
   })`${sonatypeBinaryPath}/bin/nexus run`;
 })();
