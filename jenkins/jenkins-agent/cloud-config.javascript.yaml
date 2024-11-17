@@ -18,7 +18,17 @@ packages:
   - nodejs
   - npm
 
+# Prevent modified /etc/app/sources.list got overwritten.
+apt:
+  preserve_sources_list: true
+
+# Use self-host Sonatype Nexus as apt proxy.  
+bootcmd:
+  - echo $(ip route | grep -e "^default" | cut -f3 -d" ") > /etc/OUTER_HOST_IP_ADDRESS.conf
+  - echo "deb http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/apt-proxy noble main universe multiverse" >> /etc/apt/sources.list
+  - echo "deb http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/apt-proxy noble-updates main universe multiverse" >> /etc/apt/sources.list
+
 # Configure to use self-hosted Sonatype Nexus as npm mirror.
 runcmd:
-  - npm config set -g registry http://192.168.72.1:8081/repository/npm-proxy
+  - npm config set -g registry http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/npm-proxy
   - npm config set -g audit false

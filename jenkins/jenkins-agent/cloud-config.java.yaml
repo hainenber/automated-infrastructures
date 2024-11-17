@@ -17,7 +17,18 @@ packages:
   - openjdk-21-jdk-headless
   - maven
 
-# Pre-create Maven settings that links to mirrors in Jenkins agent home directory
+# Prevent modified /etc/app/sources.list got overwritten.
+apt:
+  preserve_sources_list: true
+
+# Use self-host Sonatype Nexus as apt proxy.  
+bootcmd:
+  - echo $(ip route | grep -e "^default" | cut -f3 -d" ") > /etc/OUTER_HOST_IP_ADDRESS.conf
+  - echo "deb http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/apt-proxy noble main universe multiverse" >> /etc/apt/sources.list
+  - echo "deb http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/apt-proxy noble-updates main universe multiverse" >> /etc/apt/sources.list
+
+# Write a Maven user-specific settings file with template for Maven mirror.
+# The OUTER_HOST_IP_ADDRESS string will be replaced with actual host in `runcmd` section.
 write_files:
   - path: /home/jenkins/.m2/settings.xml
     content: |
@@ -27,13 +38,13 @@ write_files:
         <!--This sends everything else to /public -->
           <id>central</id>
           <mirrorOf>central</mirrorOf>
-          <url>http://192.168.72.1:8081/repository/maven-public/</url>
+          <url>http://OUTER_HOST_IP_ADDRESS:8081/repository/maven-public/</url>
         </mirror>
           <mirror>
           <!--This sends everything else to /public -->
           <id>jenkins-public</id>
           <mirrorOf>jenkins-public</mirrorOf>
-          <url>http://192.168.72.1:8081/repository/jenkins-public/</url>
+          <url>http://OUTER_HOST_IP_ADDRESS:8081/repository/jenkins-public/</url>
         </mirror>
         </mirrors>
         <profiles>
@@ -68,3 +79,7 @@ write_files:
     permissions: "0644"
     encoding: text/plain
     defer: true
+
+# Substitute the variable with actual apt mirror URL 
+runcmd:
+  - sed -i.bak "s/OUTER_HOST_IP_ADDRESS/$(cat /etc/OUTER_HOST_IP_ADDRESS.conf)/g" /home/jenkins/.m2/settings.xml 
