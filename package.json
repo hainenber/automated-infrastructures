@@ -14,7 +14,7 @@
     "sync_forked_repos": "node scripts/sync_forked_repos.js"
   },
   "dependencies": {
-    "@logtape/logtape": "^0.7.1",
+    "@logtape/logtape": "^0.8.0",
     "es-toolkit": "^1.27.0",
     "execa": "^9.5.1",
     "glob": "^11.0.0",
