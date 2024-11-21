@@ -22,7 +22,7 @@ packages:
 apt:
   preserve_sources_list: true
 
-# Use self-host Sonatype Nexus as apt proxy.  
+# Use self-host Sonatype Nexus as apt proxy.
 bootcmd:
   - echo $(ip route | grep -e "^default" | cut -f3 -d" ") > /etc/OUTER_HOST_IP_ADDRESS.conf
   - echo "deb http://$(cat /etc/OUTER_HOST_IP_ADDRESS.conf):8081/repository/apt-proxy noble main universe multiverse" >> /etc/apt/sources.list
