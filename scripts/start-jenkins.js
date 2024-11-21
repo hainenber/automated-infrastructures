@@ -2,10 +2,10 @@ import { execa } from "execa";
 import { join as pathJoin } from "path";
 import { writeFile } from "fs/promises";
 import { cpSync, mkdirSync, readdirSync } from "fs";
-import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
 import { drop, head, isNil, isNotNil } from "es-toolkit";
 import { cwd } from "process";
 import {
+  configureLogger,
   fileExists,
   folderExists,
   generateLogFilenameWithTimestamp,
@@ -26,11 +26,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
 
 (async () => {
   // Configure logger.
-  await configure({
-    sinks: { console: getConsoleSink() },
-    loggers: [{ category: PROJECT_NAME, level: "debug", sinks: ["console"] }],
-  });
-  const logger = getLogger([PROJECT_NAME, SERVICE]);
+  const logger = await configureLogger(PROJECT_NAME, SERVICE);
 
   // Check if Jenkins-related resource version file is present
   const { error, versionData } = getArtifactVersionData(SERVICE);

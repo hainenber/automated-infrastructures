@@ -7,11 +7,22 @@ import { fromPairs } from "es-toolkit/compat";
 export const VERSION_LIMIT = 3;
 export const PROJECT_NAME = "auto-infra";
 
+export const configureLogger = async (PROJECT_NAME, SERVICE) => {
+  await configure({
+    sinks: { console: getConsoleSink() },
+    loggers: [{ category: PROJECT_NAME, level: "debug", sinks: ["console"] }],
+  });
+  return getLogger([PROJECT_NAME, SERVICE]);
+};
+
+export const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+
 export const generateLogFilenameWithTimestamp = (service) => {
   const currentDate = new Date();
   return `${service}-${currentDate.getFullYear()}-${currentDate.getMonth()}-${currentDate.getDay()}.log`;
 };
 
+// File utils
 export const fileExists = (path) => statSync(path, { throwIfNoEntry: false });
 export const folderExists = (path) => statSync(path, { throwIfNoEntry: false }).isDirectory();
 

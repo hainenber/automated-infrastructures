@@ -1,11 +1,10 @@
 import { execa } from "execa";
 import { join as pathJoin, basename as pathBasename } from "path";
 import { lstatSync, mkdirSync, readdirSync } from "fs";
-import { configure, getConsoleSink, getLogger } from "@logtape/logtape";
 import { head } from "es-toolkit";
 import { homedir } from "os";
 import { cwd } from "process";
-import { generateLogFilenameWithTimestamp, PROJECT_NAME, VERSION_LIMIT } from "./utils.js";
+import { configureLogger, generateLogFilenameWithTimestamp, PROJECT_NAME, VERSION_LIMIT } from "./utils.js";
 
 // Constants
 const SERVICE = "nexus";
@@ -13,11 +12,7 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
 
 (async () => {
   // Configure logger
-  await configure({
-    sinks: { console: getConsoleSink() },
-    loggers: [{ category: PROJECT_NAME, level: "debug", sinks: ["console"] }],
-  });
-  const logger = getLogger([PROJECT_NAME, SERVICE]);
+  const logger = await configureLogger(PROJECT_NAME, SERVICE);
 
   // Start Sonatype Nexus
   // Find Nexus directory
