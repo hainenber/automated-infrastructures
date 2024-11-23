@@ -4,7 +4,14 @@ import { lstatSync, mkdirSync, readdirSync } from "fs";
 import { head } from "es-toolkit";
 import { homedir } from "os";
 import { cwd } from "process";
-import { configureLogger, generateLogFilenameWithTimestamp, PROJECT_NAME, VERSION_LIMIT } from "./utils.js";
+import {
+  configureLogger,
+  configureSonatypeNexus,
+  generateLogFilenameWithTimestamp,
+  healthcheckSonatypeNexus,
+  PROJECT_NAME,
+  VERSION_LIMIT,
+} from "./utils.js";
 
 // Constants
 const SERVICE = "nexus";
@@ -14,7 +21,6 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
   // Configure logger
   const logger = await configureLogger(PROJECT_NAME, SERVICE);
 
-  // Start Sonatype Nexus
   // Find Nexus directory
   const sonatypeFolderPath = pathJoin(cwd(), "sonatype");
   const sonatypeBinaryPaths = readdirSync(sonatypeFolderPath)
@@ -58,9 +64,17 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
   // Start Nexus
   const jvmCandidate = head(jvmCandidates);
   const nexusLogFilename = generateLogFilenameWithTimestamp(SERVICE);
-  await execa({
+  const nexusProcess = execa({
     cwd: sonatypeBinaryPath,
     env: { INSTALL4J_JAVA_HOME: jvmCandidate },
     stdout: ["inherit", { file: pathJoin(sonatypeLogPath, nexusLogFilename) }],
   })`${sonatypeBinaryPath}/bin/nexus run`;
+
+  // Check Sonatype health before configuring
+  const sonatypeIsAvailable = await healthcheckSonatypeNexus(logger);
+  if (sonatypeIsAvailable) {
+    await configureSonatypeNexus(logger);
+  }
+
+  await nexusProcess;
 })();
