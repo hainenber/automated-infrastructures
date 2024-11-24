@@ -11,7 +11,7 @@ import {
   healthcheckSonatypeNexus,
   PROJECT_NAME,
   VERSION_LIMIT,
-} from "./utils.js";
+} from "./utils/index.js";
 
 // Constants
 const SERVICE = "nexus";

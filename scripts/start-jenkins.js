@@ -12,7 +12,7 @@ import {
   getArtifactVersionData,
   PROJECT_NAME,
   VERSION_LIMIT,
-} from "./utils.js";
+} from "./utils/index.js";
 import { Readable } from "stream";
 import { globSync } from "glob";
 import { rimrafSync } from "rimraf";
