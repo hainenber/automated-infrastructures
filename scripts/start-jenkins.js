@@ -42,7 +42,8 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     logger.info(`Not found ${SERVICE}-${version}. Downloading ${artifact_name} from ${download_url}`);
     const response = await fetch(download_url);
     if (!response.ok) {
-      logger.fatal(`Failed to fetch ${artifact_name}: ${response.statusText}`);
+      logger.fatal(`Failed to fetch ${artifact_name} from ${download_url}: ${response.statusText}`);
+      process.exit(1);
     }
     const stream = Readable.fromWeb(response.body);
     await writeFile(artifactPath, stream);
