@@ -20,3 +20,6 @@ node_modules
 # Sonatype Nexus installation
 sonatype/nexus-*
 sonatype/sonatype-work/nexus3
+
+# dotenv files used to stored sensitive information locally
+.env
