@@ -1,5 +1,5 @@
 {
   "artifact_name": "jenkins-{{ ARTIFACT_VERSION }}.war",
   "download_url": "https://github.com/jenkinsci/jenkins/releases/download/jenkins-{{ ARTIFACT_VERSION }}/jenkins.war",
-  "version": "2.486"
+  "version": "2.485"
 }
