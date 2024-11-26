@@ -8,7 +8,7 @@ export const SONATYPE_BASE_URL = "http://localhost:8081";
 export const configureLogger = async (PROJECT_NAME, SERVICE) => {
   await configure({
     sinks: { console: getConsoleSink() },
-    loggers: [{ category: PROJECT_NAME, level: "debug", sinks: ["console"] }],
+    loggers: [{ category: PROJECT_NAME, lowestLevel: "debug", sinks: ["console"] }],
   });
   return getLogger([PROJECT_NAME, SERVICE]);
 };
