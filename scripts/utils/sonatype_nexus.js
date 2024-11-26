@@ -1,5 +1,6 @@
 import "dotenv/config";
-import { isEqual } from "es-toolkit";
+import { cloneDeep, isEqual } from "es-toolkit";
+import { unset } from "es-toolkit/compat";
 import { SONATYPE_BASE_URL } from "./common.js";
 
 // Check if local Sonatype Nexus server is up and running.
@@ -52,36 +53,116 @@ export const configureSonatypeNexus = async (logger) => {
   const proxiesToBeMade = [
     {
       name: "jenkins-public",
+      url: `${SONATYPE_BASE_URL}/repository/jenkins-public`,
+      online: true,
+      storage: {
+        blobStoreName: "default",
+        strictContentTypeValidation: true,
+        writePolicy: "ALLOW",
+      },
+      cleanup: null,
+      proxy: {
+        remoteUrl: "https://repo.jenkins-ci.org/public/",
+        contentMaxAge: -1,
+        metadataMaxAge: 1440,
+      },
+      negativeCache: {
+        enabled: true,
+        timeToLive: 1440,
+      },
+      httpClient: {
+        blocked: false,
+        autoBlock: true,
+        connection: {
+          retries: null,
+          userAgentSuffix: null,
+          timeout: null,
+          enableCircularRedirects: false,
+          enableCookies: false,
+          useTrustStore: false,
+        },
+        authentication: null,
+      },
+      routingRuleName: null,
+      maven: {
+        versionPolicy: "RELEASE",
+        layoutPolicy: "STRICT",
+        contentDisposition: "INLINE",
+      },
       format: "maven2",
       type: "proxy",
-      url: `${SONATYPE_BASE_URL}/repository/jenkins-public`,
-      attributes: {
-        proxy: {
-          remoteUrl: "https://repo.jenkins-ci.org/public/",
-        },
-      },
     },
     {
       name: "npm-proxy",
+      url: `${SONATYPE_BASE_URL}/repository/npm-proxy`,
+      online: true,
+      storage: {
+        blobStoreName: "default",
+        strictContentTypeValidation: true,
+        writePolicy: "ALLOW",
+      },
+      cleanup: null,
+      proxy: {
+        remoteUrl: "https://registry.npmjs.org/",
+        contentMaxAge: -1,
+        metadataMaxAge: 1440,
+      },
+      negativeCache: {
+        enabled: true,
+        timeToLive: 1440,
+      },
+      httpClient: {
+        blocked: false,
+        autoBlock: true,
+        connection: {
+          retries: null,
+          userAgentSuffix: null,
+          timeout: null,
+          enableCircularRedirects: false,
+          enableCookies: false,
+          useTrustStore: false,
+        },
+        authentication: null,
+      },
+      routingRuleName: null,
+      npm: {
+        removeQuarantined: false,
+      },
       format: "npm",
       type: "proxy",
-      url: `${SONATYPE_BASE_URL}/repository/npm-proxy`,
-      attributes: {
-        proxy: {
-          remoteUrl: "https://registry.npmjs.org/",
-        },
-      },
     },
     {
       name: "apt-proxy",
+      url: `${SONATYPE_BASE_URL}/repository/apt-proxy`,
+      online: true,
+      storage: {
+        blobStoreName: "default",
+        strictContentTypeValidation: true,
+        writePolicy: "ALLOW",
+      },
+      cleanup: null,
+      apt: {
+        distribution: "noble",
+        flat: false,
+      },
+      proxy: {
+        remoteUrl: "http://ports.ubuntu.com/ubuntu-ports",
+        contentMaxAge: 1440,
+        metadataMaxAge: 1440,
+      },
+      negativeCache: {
+        enabled: true,
+        timeToLive: 1440,
+      },
+      httpClient: {
+        blocked: false,
+        autoBlock: false,
+        connection: null,
+        authentication: null,
+      },
+      routingRuleName: null,
       format: "apt",
       type: "proxy",
-      url: `${SONATYPE_BASE_URL}/repository/apt-proxy`,
-      attributes: {
-        proxy: {
-          remoteUrl: "http://ports.ubuntu.com/ubuntu-ports",
-        },
-      },
     },
   ];
 
@@ -93,24 +174,49 @@ export const configureSonatypeNexus = async (logger) => {
   };
 
   // Create proxies if not exists
-  const existingProxies = await (
-    await fetch(`${SONATYPE_BASE_URL}/service/rest/v1/repositories`, {
-      headers: authorizationHeader,
-    })
-  ).json();
-
   for (const proxyToBeMade of proxiesToBeMade) {
-    if (existingProxies.some((p) => isEqual(p, proxyToBeMade))) {
-      logger.info(`Sonatype Nexus has repository ${proxyToBeMade.name} at URL ${proxyToBeMade.url}. Skip creation.`);
-    } else {
+    const repoAPI = getRepoAPIMapping(proxyToBeMade.format);
+    const existingProxyDataResponse = await fetch(
+      `${SONATYPE_BASE_URL}/service/rest/v1/repositories/${proxyToBeMade.name}`,
+      {
+        headers: authorizationHeader,
+      },
+    );
+
+    if (existingProxyDataResponse.ok) {
+      const existingProxyData = await existingProxyDataResponse.json();
+
+      // Remove "online" field when perform comparison as Nexus repository might not be ready.
+      // Reinstation of online-ness for Nexus repository occurs later.
+      const clonedExistingProxydata = cloneDeep(existingProxyData);
+      const clonedProxyToBeMade = cloneDeep(clonedExistingProxydata);
+      unset(clonedExistingProxydata, "online");
+      unset(clonedProxyToBeMade, "online");
+
+      if (isEqual(clonedExistingProxydata, clonedProxyToBeMade)) {
+        logger.info(`Sonatype Nexus has repository ${proxyToBeMade.name} at URL ${proxyToBeMade.url}. Skip creation.`);
+      }
+    } else if (existingProxyDataResponse.status === 404) {
       logger.info(
         `Sonatype Nexus does NOT have repository ${proxyToBeMade.name} at URL ${proxyToBeMade.url}. Creating ...`,
       );
-      // TODO
+      const createRepoResponse = await fetch(
+        `${SONATYPE_BASE_URL}/service/rest/v1/repositories/${repoAPI}/${proxyToBeMade.type}`,
+        {
+          method: "POST",
+          headers: {
+            ...authorizationHeader,
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(proxyToBeMade),
+        },
+      );
+      if (createRepoResponse.ok && createRepoResponse.status === 201) {
+        logger.info(`Created ${proxyToBeMade.format} ${proxyToBeMade.type} repository "${proxyToBeMade.name}".`);
+      }
     }
 
     // Enable them online afterwards if they are offline.
-    const repoAPI = getRepoAPIMapping(proxyToBeMade.format);
     const proxyRepoData = (
       await fetch(
         `${SONATYPE_BASE_URL}/service/rest/v1/repositories/${repoAPI}/${proxyToBeMade.type}/${proxyToBeMade.name}`,
