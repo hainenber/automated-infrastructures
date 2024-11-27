@@ -10,8 +10,8 @@
   "scripts": {
     "start-nexus": "node scripts/start-nexus.js",
     "start-jenkins": "node scripts/start-jenkins.js",
-    "lint-fix": "npx prettier . --write",
-    "sync_forked_repos": "node scripts/sync_forked_repos.js"
+    "lint-fix": "deno fmt",
+    "sync_forked_repos": "deno run --allow-net --allow-env scripts/sync_forked_repos.ts"
   },
   "dependencies": {
     "@logtape/logtape": "^0.8.0",
