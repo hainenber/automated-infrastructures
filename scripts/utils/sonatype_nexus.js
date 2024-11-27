@@ -32,7 +32,9 @@ export const healthcheckSonatypeNexus = async (logger) => {
   }
 
   if (retryCount > retryLimit) {
-    logger.fatal("Sonatype Nexus is not up and running even after 20 seconds. Exit now...");
+    logger.fatal(
+      "Sonatype Nexus is not up and running even after 20 seconds. Exit now...",
+    );
     return false;
   } else if (sonatypeIsAvailable) {
     logger.info("Sonatype Nexus is now up and running. Proceeding...");
@@ -170,7 +172,9 @@ export const configureSonatypeNexus = async (logger) => {
   const SONATYPE_ADMIN_USERNAME = process.env.SONATYPE_ADMIN_USERNAME;
   const SONATYPE_ADMIN_PASSWORD = process.env.SONATYPE_ADMIN_PASSWORD;
   const authorizationHeader = {
-    Authorization: `Basic ${btoa(`${SONATYPE_ADMIN_USERNAME}:${SONATYPE_ADMIN_PASSWORD}`)}`,
+    Authorization: `Basic ${
+      btoa(`${SONATYPE_ADMIN_USERNAME}:${SONATYPE_ADMIN_PASSWORD}`)
+    }`,
   };
 
   // Create proxies if not exists
@@ -194,7 +198,9 @@ export const configureSonatypeNexus = async (logger) => {
       unset(clonedProxyToBeMade, "online");
 
       if (isEqual(clonedExistingProxydata, clonedProxyToBeMade)) {
-        logger.info(`Sonatype Nexus has repository ${proxyToBeMade.name} at URL ${proxyToBeMade.url}. Skip creation.`);
+        logger.info(
+          `Sonatype Nexus has repository ${proxyToBeMade.name} at URL ${proxyToBeMade.url}. Skip creation.`,
+        );
       }
     } else if (existingProxyDataResponse.status === 404) {
       logger.info(
@@ -212,7 +218,9 @@ export const configureSonatypeNexus = async (logger) => {
         },
       );
       if (createRepoResponse.ok && createRepoResponse.status === 201) {
-        logger.info(`Created ${proxyToBeMade.format} ${proxyToBeMade.type} repository "${proxyToBeMade.name}".`);
+        logger.info(
+          `Created ${proxyToBeMade.format} ${proxyToBeMade.type} repository "${proxyToBeMade.name}".`,
+        );
       }
     }
 
@@ -227,7 +235,9 @@ export const configureSonatypeNexus = async (logger) => {
     ).json();
 
     if (!Boolean(proxyRepoData.online)) {
-      logger.info(`Proxy-type repository ${proxyToBeMade.name} is NOT online. Updating it to be online...`);
+      logger.info(
+        `Proxy-type repository ${proxyToBeMade.name} is NOT online. Updating it to be online...`,
+      );
       const proxyRepoDataUpdateToBeOnline = await fetch(
         `${SONATYPE_BASE_URL}/service/rest/v1/repositories/${repoAPI}/${proxyToBeMade.type}/${proxyToBeMade.name}`,
         {
@@ -237,10 +247,14 @@ export const configureSonatypeNexus = async (logger) => {
         },
       );
       if (proxyRepoDataUpdateToBeOnline.status === 204) {
-        logger.info(`Proxy-type repository ${proxyToBeMade.online} is updated to be online.`);
+        logger.info(
+          `Proxy-type repository ${proxyToBeMade.online} is updated to be online.`,
+        );
       }
     } else {
-      logger.info(`Proxy-type repository ${proxyToBeMade.online} is online. Skip updating...`);
+      logger.info(
+        `Proxy-type repository ${proxyToBeMade.online} is online. Skip updating...`,
+      );
     }
   }
 };

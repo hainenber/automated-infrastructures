@@ -1,5 +1,5 @@
 import { execa } from "execa";
-import { join as pathJoin, basename as pathBasename } from "path";
+import { basename as pathBasename, join as pathJoin } from "path";
 import { lstatSync, mkdirSync, readdirSync } from "fs";
 import { head } from "es-toolkit";
 import { homedir } from "os";
@@ -25,21 +25,30 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
   const sonatypeFolderPath = pathJoin(cwd(), "sonatype");
   const sonatypeBinaryPaths = readdirSync(sonatypeFolderPath)
     .map((fileName) => pathJoin(sonatypeFolderPath, fileName))
-    .filter((fileName) => lstatSync(fileName).isDirectory() && fileName.includes(`${SERVICE}-`));
+    .filter((fileName) =>
+      lstatSync(fileName).isDirectory() && fileName.includes(`${SERVICE}-`)
+    );
 
   // Validating presence of Nexus binary path(s)
   if (sonatypeBinaryPaths.length == 0) {
     logger.fatal("Not found any Nexus directory");
     process.exit(1);
   } else if (sonatypeBinaryPaths.length > 3) {
-    logger.warn(`Found multiple Nexus directory ${sonatypeBinaryPaths}. Please keep them to minimal ${VERSION_LIMIT}`);
+    logger.warn(
+      `Found multiple Nexus directory ${sonatypeBinaryPaths}. Please keep them to minimal ${VERSION_LIMIT}`,
+    );
   }
 
   const sonatypeBinaryPath = head(sonatypeBinaryPaths);
 
   // Find suitable JVM directory in $HOME/.sdk/candidates directory.
   // Prequisites is that `sdkman` is installed and Java 17 has been installed previously.
-  const jvmCandidatesPath = pathJoin(homedir(), ".sdkman", "candidates", "java");
+  const jvmCandidatesPath = pathJoin(
+    homedir(),
+    ".sdkman",
+    "candidates",
+    "java",
+  );
   if (!lstatSync(jvmCandidatesPath)) {
     logger.fatal("Not found the path used by sdkman to install Java.");
     process.exit(1);
@@ -48,12 +57,15 @@ const NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION = "17";
     .map((fileName) => pathJoin(jvmCandidatesPath, fileName))
     .filter(
       (fileName) =>
-        lstatSync(fileName).isDirectory() && pathBasename(fileName).startsWith(NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION),
+        lstatSync(fileName).isDirectory() &&
+        pathBasename(fileName).startsWith(NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION),
     );
 
   // Validating presence of suitable JVM
   if (jvmCandidates.length == 0) {
-    logger.fatal(`Not found any Java ${NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION} candidate`);
+    logger.fatal(
+      `Not found any Java ${NEXUS_COMPATIBLE_JAVA_MAJOR_VERSION} candidate`,
+    );
     process.exit(1);
   }
 
