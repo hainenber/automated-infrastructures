@@ -1,17 +1,22 @@
 import "dotenv/config";
 import { cloneDeep, isEqual } from "es-toolkit";
 import { unset } from "es-toolkit/compat";
-import { SONATYPE_BASE_URL } from "./common.js";
+import { sleep, SONATYPE_BASE_URL } from "./common.ts";
+import { Logger } from "@logtape/logtape";
+
+interface SonatypeNexusRepoResponse {
+  online: boolean;
+}
 
 // Check if local Sonatype Nexus server is up and running.
 export const healthcheckSonatypeNexus = async (logger) => {
   const read_healthcheck_url = `${SONATYPE_BASE_URL}/service/rest/v1/status`;
 
-  const retryLimit = 20;
+  const retryLimit = 30;
   let retryCount = 0;
   let sonatypeIsAvailable = false;
 
-  while (!sonatypeIsAvailable || retryCount <= retryLimit) {
+  while (retryCount <= retryLimit) {
     try {
       const response = await fetch(read_healthcheck_url, {
         headers: { "Content-Type": "application/json" },
@@ -26,7 +31,7 @@ export const healthcheckSonatypeNexus = async (logger) => {
           `[${retryCount}/${retryLimit} retries] Sonatype Nexus is not yet available. Retrying healthcheck after 1 second...`,
         );
         retryCount += 1;
-        sleep(1000);
+        await sleep(1000);
       }
     }
   }
@@ -43,7 +48,7 @@ export const healthcheckSonatypeNexus = async (logger) => {
   return true;
 };
 
-const getRepoAPIMapping = (repoType) => {
+const getRepoAPIMapping = (repoType: string): string => {
   if (String(repoType).includes("maven")) {
     return "maven";
   }
@@ -51,7 +56,7 @@ const getRepoAPIMapping = (repoType) => {
 };
 
 // Configuration
-export const configureSonatypeNexus = async (logger) => {
+export const configureSonatypeNexus = async (logger: Logger): Promise<void> => {
   const proxiesToBeMade = [
     {
       name: "jenkins-public",
@@ -225,14 +230,14 @@ export const configureSonatypeNexus = async (logger) => {
     }
 
     // Enable them online afterwards if they are offline.
-    const proxyRepoData = (
+    const proxyRepoData = await (
       await fetch(
         `${SONATYPE_BASE_URL}/service/rest/v1/repositories/${repoAPI}/${proxyToBeMade.type}/${proxyToBeMade.name}`,
         {
           headers: authorizationHeader,
         },
       )
-    ).json();
+    ).json() as SonatypeNexusRepoResponse;
 
     if (!Boolean(proxyRepoData.online)) {
       logger.info(

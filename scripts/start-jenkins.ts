@@ -1,9 +1,14 @@
 import { execa } from "execa";
-import { join as pathJoin } from "path";
-import { writeFile } from "fs/promises";
-import { cpSync, globSync, mkdirSync, readdirSync } from "fs";
+import { join as pathJoin } from "node:path";
+import {
+  cpSync,
+  mkdirSync,
+  readdirSync,
+  writeFileSync,
+} from "node:fs";
+import { globSync } from "glob";
 import { drop, head, isNil, isNotNil } from "es-toolkit";
-import { cwd } from "process";
+import { cwd } from "node:process";
 import {
   configureLogger,
   fileExists,
@@ -12,9 +17,9 @@ import {
   getArtifactVersionData,
   PROJECT_NAME,
   VERSION_LIMIT,
-} from "./utils/index.js";
-import { Readable } from "stream";
+} from "./utils/index.ts";
 import { rimrafSync } from "rimraf";
+import axios from "axios";
 
 // Constants
 const SERVICE = "jenkins";
@@ -43,15 +48,16 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     logger.info(
       `Not found ${SERVICE}-${version}. Downloading ${artifact_name} from ${download_url}`,
     );
-    const response = await fetch(download_url);
-    if (!response.ok) {
+    const response = await axios.get(download_url, {
+      responseType: "arraybuffer",
+    });
+    if (response.status >= 200 && response.status < 300) {
       logger.fatal(
         `Failed to fetch ${artifact_name} from ${download_url}: ${response.statusText}`,
       );
       process.exit(1);
     }
-    const stream = Readable.fromWeb(response.body);
-    await writeFile(artifactPath, stream);
+    writeFileSync(artifactPath, response.data);
   } else {
     logger.info(`${artifact_name} exists. Skip download`);
   }
@@ -91,12 +97,12 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     );
     process.exit(1);
   } else {
-    const javaVersion = head(javaVersionData).split(/\s+/).at(1);
-    const javaVersionComponents = javaVersion.split(".");
-    const javaMajorVersion = head(javaVersionComponents) === "1"
-      ? javaVersionComponents.at(1)
-      : head(javaVersionComponents);
-    if (parseInt(javaMajorVersion, 10) < JENKINS_MINIMAL_JAVA_VERSION) {
+    const javaVersion = head(javaVersionData)?.split(/\s+/).at(1);
+    const javaVersionComponents = javaVersion?.split(".");
+    const javaMajorVersion = head(javaVersionComponents ?? []) === "1"
+      ? javaVersionComponents?.at(1)
+      : head(javaVersionComponents ?? []);
+    if (parseInt(javaMajorVersion ?? '8', 10) < JENKINS_MINIMAL_JAVA_VERSION) {
       logger.fatal(
         `Current machine has Java version that is less than required 17 (version: ${javaMajorVersion})`,
       );
@@ -133,13 +139,20 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     const jenkinsBinary = head(
       globSync(pathJoin(jenkinsProjectPath, "jenkins-*.war")),
     );
-    await execa({
-      timeout: 60000,
-      stdout: ["inherit"],
-      stderr: ["inherit"],
-    })`java -jar ${jenkinsPluginManager} --war ${jenkinsBinary} --verbose --plugin-download-directory ${
-      pathJoin(jenkinsProjectPath, "data", "plugins")
-    } --plugin-file ${jenkinsPluginConfigPath}`;
+    if (jenkinsPluginManager && jenkinsBinary) {
+      await execa({
+        timeout: 60000,
+        stdout: ["inherit"],
+        stderr: ["inherit"],
+      })`java -jar ${jenkinsPluginManager} --war ${jenkinsBinary} --verbose --plugin-download-directory ${
+        pathJoin(jenkinsProjectPath, "data", "plugins")
+      } --plugin-file ${jenkinsPluginConfigPath}`;
+    } else {
+      logger.fatal(
+        `Not finding neither Jenkins Plugin Manager JAR nor Jenkins WAR`,
+      );
+      process.exit(1);
+    }
   } else {
     logger.warn(
       "Configuration file for Jenkins plugins are not found. Handle plugins manually.",

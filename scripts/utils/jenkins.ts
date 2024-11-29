@@ -1,10 +1,22 @@
 import Mustache from "mustache";
-import { readFileSync } from "fs";
-import { join as pathJoin } from "path";
-import { cwd } from "process";
+import { readFileSync } from "node:fs";
+import { join as pathJoin } from "node:path";
+import { cwd } from "node:process";
 import { fromPairs } from "es-toolkit/compat";
 
-export const getArtifactVersionData = (service) => {
+interface ArtifactVersionSchema {
+  artifact_name: string;
+  download_url: string;
+  version: string;
+}
+interface ArtifactVersionData {
+  versionData: ArtifactVersionSchema | null;
+  error: Error | null;
+}
+
+export const getArtifactVersionData = (
+  service: string,
+): ArtifactVersionData => {
   const artifactVersionFolderPath = cwd();
   try {
     // Read the .version.json file and extract the version.
@@ -15,13 +27,15 @@ export const getArtifactVersionData = (service) => {
       `${service}.version.json`,
     );
     const artifactVersionDataString = readFileSync(artifactVersionFilePath);
-    const rawArtifactVersionData = JSON.parse(artifactVersionDataString);
-    const ARTIFACT_VERSION = rawArtifactVersionData["version"];
+    const rawArtifactVersionData = JSON.parse(
+      artifactVersionDataString.toString(),
+    ) as ArtifactVersionSchema;
+    const ARTIFACT_VERSION = rawArtifactVersionData.version;
 
     if (ARTIFACT_VERSION === null) {
       return {
         versionData: null,
-        error: new Error(`No artifact version for ${version}`),
+        error: new Error(`No artifact version for ${service}`),
       };
     }
 
@@ -34,9 +48,9 @@ export const getArtifactVersionData = (service) => {
         });
         return [key, rendered];
       }),
-    );
+    ) as ArtifactVersionSchema;
 
-    versionData["version"] = ARTIFACT_VERSION;
+    versionData.version = ARTIFACT_VERSION;
 
     return {
       versionData: versionData,
