@@ -1,6 +1,7 @@
 import { execa } from "execa";
 import { join as pathJoin } from "node:path";
 import {
+  copyFileSync,
   cpSync,
   mkdirSync,
   readdirSync,
@@ -102,7 +103,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
     const javaMajorVersion = head(javaVersionComponents ?? []) === "1"
       ? javaVersionComponents?.at(1)
       : head(javaVersionComponents ?? []);
-    if (parseInt(javaMajorVersion ?? '8', 10) < JENKINS_MINIMAL_JAVA_VERSION) {
+    if (parseInt(javaMajorVersion ?? "8", 10) < JENKINS_MINIMAL_JAVA_VERSION) {
       logger.fatal(
         `Current machine has Java version that is less than required 17 (version: ${javaMajorVersion})`,
       );
@@ -172,27 +173,35 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   );
   if (folderExists(backupInitHookScriptDir)) {
     if (readdirSync(configuredInitHookScriptDir).length > 0) {
-      logger.info(`Deleting all files in ${configuredInitHookScriptDir}`);
-      rimrafSync(`${configuredInitHookScriptDir}/*`);
-      logger.info(`Deleted all files in ${configuredInitHookScriptDir}`);
+      logger.info(`Deleting all init Groovy hook scripts in ${configuredInitHookScriptDir}`);
+      rimrafSync(configuredInitHookScriptDir);
+      logger.info(`Deleted all init Groovy hook scripts in ${configuredInitHookScriptDir}`);
     }
     cpSync(backupInitHookScriptDir, configuredInitHookScriptDir, {
       recursive: true,
     });
   }
 
-  // Copy local secrets to $JENKINS_HOME for configuration by JCasC
+  // Copy local secrets to $JENKINS_HOME for configuration by JCasC.
+  // Cleanup existing secrets in $JENKINS_HOME to ensure idempotency.
   const localSecretPath = pathJoin(jenkinsProjectPath, "secrets");
   const configuredSecretPath = pathJoin(jenkinsProjectPath, "data", "secrets");
-  logger.info(
-    `Copying local secrets in ${localSecretPath} to ${configuredSecretPath}`,
-  );
-  cpSync(pathJoin(jenkinsProjectPath, "secrets"), configuredSecretPath, {
-    recursive: true,
-  });
-  logger.info(
-    `Copied local secrets in ${localSecretPath} to ${configuredSecretPath}`,
-  );
+  for (const localSecretFilename of readdirSync(localSecretPath)) {
+    const configuredSecretFilepath = pathJoin(
+      configuredSecretPath,
+      localSecretFilename,
+    );
+    logger.info(
+      `Copying local secrets in ${localSecretPath} to ${configuredSecretPath}`,
+    );
+    copyFileSync(
+      pathJoin(localSecretPath, localSecretFilename),
+      configuredSecretFilepath,
+    );
+    logger.info(
+      `Copied local secrets in ${localSecretPath} to ${configuredSecretPath}`,
+    );
+  }
 
   // Start Jenkins
   const jenkinsBinary = pathJoin(jenkinsProjectPath, artifact_name);
