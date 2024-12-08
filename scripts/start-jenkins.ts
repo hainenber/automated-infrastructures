@@ -17,6 +17,7 @@ import {
   generateLogFilenameWithTimestamp,
   getArtifactVersionData,
   PROJECT_NAME,
+  requireJava,
   VERSION_LIMIT,
 } from "./utils/index.ts";
 import { rimrafSync } from "rimraf";
@@ -87,29 +88,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   // If present, check if Java installation is Java17 or else.
   // Beginning with the Jenkins 2.463 weekly release (scheduled for release on June 18, 2024), Jenkins requires Java 17 or newer
   // Source: https://www.jenkins.io/blog/2024/06/11/require-java-17/
-  const { stdout: javaVersionData, exitCode } = await execa({
-    stderr: "ignore",
-    reject: false,
-    lines: true,
-  })`java --version`;
-  if (isNil(process.env.JAVA_HOME) || exitCode !== 0) {
-    logger.fatal(
-      "Current machine does not have Java installation to proceed further",
-    );
-    process.exit(1);
-  } else {
-    const javaVersion = head(javaVersionData)?.split(/\s+/).at(1);
-    const javaVersionComponents = javaVersion?.split(".");
-    const javaMajorVersion = head(javaVersionComponents ?? []) === "1"
-      ? javaVersionComponents?.at(1)
-      : head(javaVersionComponents ?? []);
-    if (parseInt(javaMajorVersion ?? "8", 10) < JENKINS_MINIMAL_JAVA_VERSION) {
-      logger.fatal(
-        `Current machine has Java version that is less than required 17 (version: ${javaMajorVersion})`,
-      );
-      process.exit(1);
-    }
-  }
+  await requireJava(logger, JENKINS_MINIMAL_JAVA_VERSION);
 
   // Create directory for Jenkins logs and plugins
   for (
@@ -126,7 +105,7 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   }
 
   // Prepare the plugins with jenkins-plugin-manager.
-  // The commmand times out after 1 minute.
+  // The process should run under 1 minute, else it'll be timed out by configuration.
   const jenkinsPluginConfigPath = pathJoin(
     jenkinsProjectPath,
     "configs",
@@ -173,9 +152,13 @@ const jenkinsProjectPath = pathJoin(ROOT_DIR, SERVICE);
   );
   if (folderExists(backupInitHookScriptDir)) {
     if (readdirSync(configuredInitHookScriptDir).length > 0) {
-      logger.info(`Deleting all init Groovy hook scripts in ${configuredInitHookScriptDir}`);
+      logger.info(
+        `Deleting all init Groovy hook scripts in ${configuredInitHookScriptDir}`,
+      );
       rimrafSync(configuredInitHookScriptDir);
-      logger.info(`Deleted all init Groovy hook scripts in ${configuredInitHookScriptDir}`);
+      logger.info(
+        `Deleted all init Groovy hook scripts in ${configuredInitHookScriptDir}`,
+      );
     }
     cpSync(backupInitHookScriptDir, configuredInitHookScriptDir, {
       recursive: true,
