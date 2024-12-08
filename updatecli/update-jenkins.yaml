@@ -13,14 +13,20 @@ scms:
       branch: "{{ .github.branch }}"
 
 sources:
-  jenkinsWeekly:
+  jenkinsGithubWeekly:
     name: Get latest Jenkins weekly version
-    kind: jenkins
+    kind: githubrelease
     spec:
-      release: weekly
+      owner: jenkinsci
+      repository: jenkins
+      token: "{{ requiredEnv .github.token }}"
+      username: "{{ .github.username }}"
+      versionfilter:
+        kind: regex
+        pattern: ^(\d*).(\d*).(\d*)$
 
+# Test that the version from source is a weekly release
 conditions:
-  # Test that the version from source is a weekly release
   jenkinsWeekly:
     kind: jenkins
     spec:
