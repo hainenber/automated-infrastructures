@@ -4,8 +4,5 @@ updates:
     directory: /
     schedule:
       interval: "daily"
-    labels:
-      - npm
-      - dependabot
     open-pull-requests-limit: 20
     versioning-strategy: increase
