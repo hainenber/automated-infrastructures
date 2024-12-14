@@ -11,7 +11,7 @@ import {
   healthcheckSonatypeNexus,
   PROJECT_NAME,
   VERSION_LIMIT,
-} from "./utils/index.js";
+} from "./utils/index.ts";
 import { Logger } from "@logtape/logtape";
 
 // Constants

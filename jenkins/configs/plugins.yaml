@@ -62,3 +62,6 @@ plugins:
   - artifactId: ansicolor # AnsiColor
     source:
       version: latest
+  - artifactId: multipas-cloud # hainenber/jenkins-multipass-cloud-plugin
+    source:
+      url: https://github.com/hainenber/jenkins-multipass-cloud-plugin/releases/download/0.2.0/multipass-cloud.hpi
