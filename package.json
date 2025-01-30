@@ -18,7 +18,7 @@
     "@octokit/types": "^13.7.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
-    "es-toolkit": "^1.31.0",
+    "es-toolkit": "^1.32.0",
     "execa": "^9.5.2",
     "glob": "^11.0.1",
     "mustache": "^4.2.0",
