@@ -14,7 +14,7 @@
     "sync_forked_repos": "deno run --allow-net --allow-env scripts/sync_forked_repos.ts"
   },
   "dependencies": {
-    "@logtape/logtape": "^0.8.0",
+    "@logtape/logtape": "^0.9.0",
     "@octokit/types": "^13.8.0",
     "axios": "^1.7.9",
     "dotenv": "^16.4.7",
