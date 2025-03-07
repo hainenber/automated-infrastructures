@@ -16,7 +16,7 @@
   "dependencies": {
     "@logtape/logtape": "^0.8.0",
     "@octokit/types": "^13.8.0",
-    "axios": "^1.7.9",
+    "axios": "^1.8.2",
     "dotenv": "^16.4.7",
     "es-toolkit": "^1.32.0",
     "execa": "^9.5.2",
